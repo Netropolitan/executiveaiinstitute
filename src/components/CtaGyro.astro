@@ -1,0 +1,181 @@
+---
+// Three.js gyroscope for the roadmap CTA: four nested rings, one per
+// assessment dimension, each spinning on its own axis around a pulsing core.
+// Every ring carries a bright satellite node; thin particle trails follow the
+// satellites. Falls back to a static SVG without WebGL or with reduced motion.
+---
+<div class="cta-gyro" aria-hidden="true">
+  <svg class="gyro-fallback" viewBox="0 0 300 300" fill="none">
+    <circle cx="150" cy="150" r="130" stroke="#0d7555" stroke-width="1.5" opacity="0.6" />
+    <ellipse cx="150" cy="150" rx="130" ry="52" stroke="#059669" stroke-width="1.5" opacity="0.5" />
+    <ellipse cx="150" cy="150" rx="52" ry="130" stroke="#059669" stroke-width="1.5" opacity="0.5" />
+    <circle cx="150" cy="150" r="14" fill="#a7d8c4" />
+    <circle cx="280" cy="150" r="8" fill="#059669" />
+    <circle cx="150" cy="20" r="8" fill="#059669" />
+  </svg>
+</div>
+
+<style>
+  .cta-gyro { position: relative; width: 100%; aspect-ratio: 1; max-width: 560px; }
+  .cta-gyro canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+  .cta-gyro.live .gyro-fallback { display: none; }
+  .gyro-fallback { width: 100%; height: 100%; }
+</style>
+
+<script>
+  import * as THREE from 'three';
+
+  const host = document.querySelector('.cta-gyro') as HTMLElement;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (host && !reduced) {
+    try {
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      host.appendChild(renderer.domElement);
+      host.classList.add('live');
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 50);
+      camera.position.set(0, 0.6, 6.4);
+      camera.lookAt(0, 0, 0);
+
+      const root = new THREE.Group();
+      scene.add(root);
+
+      // ── Core: bright nucleus + soft shell ──
+      const core = new THREE.Mesh(
+        new THREE.SphereGeometry(0.34, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 0xa7d8c4 })
+      );
+      root.add(core);
+      const shell = new THREE.Mesh(
+        new THREE.SphereGeometry(0.5, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.22 })
+      );
+      root.add(shell);
+      const wire = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(0.72, 1),
+        new THREE.MeshBasicMaterial({ color: 0x059669, wireframe: true, transparent: true, opacity: 0.4 })
+      );
+      root.add(wire);
+
+      // ── Four rings, one per assessment dimension ──
+      // Each ring lives in its own pivot group with a distinct axis + speed.
+      const RINGS = [
+        { r: 1.15, tube: 0.022, color: 0x34d399, axis: [1, 0.2, 0], speed: 0.55, opacity: 0.95 },
+        { r: 1.6, tube: 0.018, color: 0x059669, axis: [0.1, 1, 0.3], speed: -0.38, opacity: 0.85 },
+        { r: 2.05, tube: 0.015, color: 0x0d7555, axis: [0.5, 0.6, 1], speed: 0.26, opacity: 0.75 },
+        { r: 2.5, tube: 0.012, color: 0x065f46, axis: [0, 0.3, 1], speed: -0.18, opacity: 0.65 },
+      ].map((cfg) => {
+        const pivot = new THREE.Group();
+        root.add(pivot);
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(cfg.r, cfg.tube, 12, 180),
+          new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: cfg.opacity })
+        );
+        pivot.add(ring);
+
+        // satellite node riding the ring
+        const sat = new THREE.Mesh(
+          new THREE.SphereGeometry(0.075, 18, 18),
+          new THREE.MeshBasicMaterial({ color: 0xfaf8f4 })
+        );
+        sat.position.set(cfg.r, 0, 0);
+        pivot.add(sat);
+        const satGlow = new THREE.Mesh(
+          new THREE.SphereGeometry(0.14, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.35 })
+        );
+        satGlow.position.copy(sat.position);
+        pivot.add(satGlow);
+
+        // trail: short arc of fading points behind the satellite
+        const TRAIL = 26;
+        const trailGeo = new THREE.BufferGeometry();
+        trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(TRAIL * 3), 3));
+        const trail = new THREE.Points(trailGeo, new THREE.PointsMaterial({
+          color: 0x9ff0cf, size: 0.045, transparent: true, opacity: 0.7, sizeAttenuation: true,
+        }));
+        pivot.add(trail);
+
+        const axis = new THREE.Vector3(...cfg.axis).normalize();
+        // random-ish initial orientation so rings don't start aligned
+        pivot.quaternion.setFromAxisAngle(axis, cfg.r * 2.1);
+        return { pivot, ring, sat, satGlow, trail, trailGeo, TRAIL, axis, speed: cfg.speed, r: cfg.r, phase: cfg.r * 2.7 };
+      });
+
+      // sparse ambient stars
+      const stars = [];
+      for (let i = 0; i < 90; i++) {
+        const r = 2.8 + ((i * 0.37) % 1) * 1.6;
+        const th = i * 2.39996, ph = Math.acos(1 - 2 * ((i * 0.61) % 1));
+        stars.push(new THREE.Vector3(
+          r * Math.sin(ph) * Math.cos(th), r * Math.cos(ph) * 0.8, r * Math.sin(ph) * Math.sin(th)
+        ));
+      }
+      root.add(new THREE.Points(
+        new THREE.BufferGeometry().setFromPoints(stars),
+        new THREE.PointsMaterial({ color: 0x059669, size: 0.022, transparent: true, opacity: 0.55 })
+      ));
+
+      let tx = 0, ty = 0;
+      window.addEventListener('pointermove', (e) => {
+        tx = (e.clientX / window.innerWidth - 0.5) * 0.5;
+        ty = (e.clientY / window.innerHeight - 0.5) * 0.3;
+      }, { passive: true });
+
+      const size = () => {
+        const w = host.clientWidth, h = host.clientHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      };
+      size();
+      window.addEventListener('resize', size);
+
+      let visible = true;
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(host);
+
+      const q = new THREE.Quaternion();
+      const clock = new THREE.Clock();
+      renderer.setAnimationLoop(() => {
+        if (!visible) return;
+        const t = clock.getElapsedTime();
+
+        root.rotation.y = t * 0.06 + tx;
+        root.rotation.x = Math.sin(t * 0.14) * 0.08 + ty;
+
+        const pulse = (Math.sin(t * 1.6) + 1) / 2;
+        core.scale.setScalar(1 + pulse * 0.12);
+        shell.scale.setScalar(1 + pulse * 0.35);
+        (shell.material as THREE.MeshBasicMaterial).opacity = 0.14 + pulse * 0.16;
+        wire.rotation.y = t * 0.3;
+        wire.rotation.x = t * 0.12;
+
+        RINGS.forEach((R) => {
+          q.setFromAxisAngle(R.axis, R.speed * t + R.phase);
+          R.pivot.quaternion.copy(q);
+
+          // satellite travels around its ring; trail follows behind
+          const sa = t * (R.speed * 2.2) + R.phase * 3;
+          R.sat.position.set(Math.cos(sa) * R.r, Math.sin(sa) * R.r, 0);
+          R.satGlow.position.copy(R.sat.position);
+          R.satGlow.scale.setScalar(1 + pulse * 0.4);
+          const arr = R.trailGeo.attributes.position.array as Float32Array;
+          for (let i = 0; i < R.TRAIL; i++) {
+            const a = sa - (i + 1) * 0.05 * Math.sign(R.speed || 1);
+            arr[i * 3] = Math.cos(a) * R.r;
+            arr[i * 3 + 1] = Math.sin(a) * R.r;
+            arr[i * 3 + 2] = 0;
+          }
+          R.trailGeo.attributes.position.needsUpdate = true;
+        });
+
+        renderer.render(scene, camera);
+      });
+    } catch (e) {
+      /* WebGL unavailable; SVG fallback stays */
+    }
+  }
+</script>

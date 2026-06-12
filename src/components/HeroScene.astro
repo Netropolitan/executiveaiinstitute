@@ -36,8 +36,8 @@
   if (host && !reduced) {
     try {
       const mobile = window.matchMedia('(max-width: 760px)').matches;
-      const N = mobile ? 90 : 170;          // node count
-      const LINK = mobile ? 1.45 : 1.25;    // connection distance
+      const N = mobile ? 60 : 105;          // node count (kept sparse on purpose)
+      const LINK = mobile ? 1.4 : 1.15;     // connection distance
 
       const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -86,7 +86,7 @@
       const lineGeo = new THREE.BufferGeometry();
       lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
       group.add(new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({
-        color: 0x0d7555, transparent: true, opacity: 0.34,
+        color: 0x0d7555, transparent: true, opacity: 0.28,
       })));
 
       // Inner core ring — quiet anchor
