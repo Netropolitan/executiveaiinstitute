@@ -48,6 +48,18 @@ const nav = [
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400;1,9..40,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/axs/axs-widget.css" />
+  <style is:inline>
+    /* EAII theming for the AXS accessibility launcher: black person icon on a
+       bright green box (9:1 contrast), bottom-right corner. The Treize chat
+       FAB is BBE-specific, so it stays hidden here. */
+    #axs-widget-root .axs-fab.axs-fab--access {
+      background: #34d399 !important;
+      box-shadow: 0 4px 16px rgba(52, 211, 153, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12) inset !important;
+    }
+    #axs-widget-root .axs-fab.axs-fab--access svg { fill: #070b09 !important; }
+    #axs-widget-root .axs-fab.axs-fab--chat { display: none !important; }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -103,6 +115,7 @@ const nav = [
     </div>
   </footer>
 
+  <script src="/axs/axs-widget.js" defer is:inline></script>
   <script>
     // Mobile nav
     const t = document.querySelector('.nav-toggle');
