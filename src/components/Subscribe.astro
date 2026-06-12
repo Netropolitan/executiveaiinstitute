@@ -6,7 +6,7 @@
 // fails soft with a polite retry message.
 const {
   heading = 'Stay updated with the latest',
-  blurb = 'Intelligence for AI-era leaders — essays, event invitations and briefings. Email only, unsubscribe any time.',
+  blurb = 'Intelligence for AI-era leaders: essays, event invitations and briefings. Email only, unsubscribe any time.',
 } = Astro.props;
 ---
 <section class="sub-band" aria-label="Subscribe to updates">
@@ -81,7 +81,7 @@ const {
           ? "You're already a subscriber. Thank you."
           : "You're in. We'll keep you posted.";
       } catch (err) {
-        if (note) note.textContent = "That didn't go through — please try again in a moment.";
+        if (note) note.textContent = "That didn't go through. Please try again in a moment.";
       }
     });
   });

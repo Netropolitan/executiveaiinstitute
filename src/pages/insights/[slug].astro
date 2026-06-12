@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import CoverArt from '../../components/CoverArt.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -8,9 +7,10 @@ export async function getStaticPaths() {
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
+// Image-free article layout: a typographic masthead replaces any cover image.
 const AUTHORS = {
-  jamie: { name: 'Jamie Bykov-Brett', img: '/team/jamiebykovbrett.avif', role: 'Human-Centric Innovator & AI Technology Consultant' },
-  jonscott: { name: 'Jonscott Turco', img: '/team/jonscott.avif', role: 'Global C-Suite Advisor on AI & Leadership Behaviour' },
+  jamie: { name: 'Jamie Bykov-Brett', role: 'Human-Centric Innovator & AI Technology Consultant' },
+  jonscott: { name: 'Jonscott Turco', role: 'Global C-Suite Advisor on AI & Leadership Behaviour' },
 };
 
 const { post } = Astro.props;
@@ -19,25 +19,22 @@ const a = AUTHORS[post.data.author];
 const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 <Base title={`${post.data.title} | Executive AI Institute`} description={post.data.description}>
-  <article class="container" style="padding-top:140px;padding-bottom:110px">
-    <div style="max-width:920px;margin:0 auto">
+  <article class="container" style="padding-top:150px;padding-bottom:110px">
+    <div style="max-width:860px;margin:0 auto">
       <a class="back" href="/insights/">← All insights</a>
-      <CoverArt slug={post.id} height="clamp(180px, 26vw, 320px)" />
-      <h1 style="font-size:clamp(30px,4.4vw,56px);margin-top:36px">{post.data.title}</h1>
-      <div class="byline">
-        <img src={a.img} alt="" width="48" height="48" />
-        <span><b>{a.name}</b><br />{fmt(post.data.pubDate)}{post.data.readMinutes ? ` · ${post.data.readMinutes} min read` : ''}</span>
-      </div>
-      <div class="prose" style="margin-top:40px">
+      <header class="masthead">
+        <p class="mast-meta">{fmt(post.data.pubDate)}{post.data.readMinutes ? ` · ${post.data.readMinutes} min read` : ''}</p>
+        <h1 style="font-size:clamp(30px,4.4vw,54px)">{post.data.title}</h1>
+        <p class="mast-byline">By <b>{a.name}</b></p>
+      </header>
+      <div class="prose" style="margin-top:44px">
         <Content />
       </div>
 
-      <aside class="author-card card">
-        <img src={a.img} alt="" width="72" height="72" />
-        <div>
-          <b style="font-size:17px">{a.name}</b>
-          <p style="margin:4px 0 0;font-size:14.5px">{a.role} · <a href="/about/">About the Institute →</a></p>
-        </div>
+      <aside class="author-card">
+        <p class="mast-meta" style="margin-bottom:6px">About the author</p>
+        <b style="font-size:17px;color:var(--cream)">{a.name}</b>
+        <p style="margin:4px 0 0;font-size:14.5px">{a.role} · <a href="/about/">About the Institute →</a></p>
       </aside>
 
       <div class="post-cta">
@@ -49,13 +46,20 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 
 </Base>
 
 <style>
-  .back { display: inline-block; font-weight: 700; color: var(--emerald); margin-bottom: 28px; }
+  .back { display: inline-block; font-weight: 700; color: var(--emerald); margin-bottom: 34px; }
   .back:hover { color: var(--sage); }
-  .byline { display: flex; align-items: center; gap: 14px; margin-top: 22px; }
-  .byline img { border-radius: 50%; width: 48px; height: 48px; object-fit: cover; border: 1.5px solid var(--emerald); }
-  .byline span { font-size: 14px; color: var(--faint); line-height: 1.5; }
-  .byline b { color: var(--mist); }
-  .author-card { display: flex; align-items: center; gap: 20px; margin-top: 64px; padding: 26px 30px; }
-  .author-card img { border-radius: 50%; width: 72px; height: 72px; object-fit: cover; border: 2px solid var(--emerald); }
+  .masthead { border-top: 3px solid var(--emerald); padding-top: 26px; }
+  .mast-meta {
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--emerald); margin-bottom: 16px;
+  }
+  .mast-byline { font-size: 15px; color: var(--faint); margin: 6px 0 0; }
+  .mast-byline b { color: var(--mist); }
+  .author-card {
+    margin-top: 64px; padding: 26px 30px;
+    border-left: 3px solid var(--emerald);
+    background: linear-gradient(160deg, var(--pine), var(--onyx));
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
   .post-cta { text-align: center; margin-top: 56px; padding-top: 48px; border-top: 1px solid var(--line); }
 </style>

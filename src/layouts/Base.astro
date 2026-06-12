@@ -3,7 +3,7 @@ import '../styles/theme.css';
 import Subscribe from '../components/Subscribe.astro';
 const {
   title = 'Executive AI Institute | Leadership For The Age Of AI',
-  description = 'The Executive AI Institute equips senior leaders with people-first AI strategy — world-class leadership psychology meets deep technical mastery.',
+  description = 'The Executive AI Institute equips senior leaders with people-first AI strategy: world-class leadership psychology meets deep technical mastery.',
   noindex = false,
   hideSubscribe = false,
 } = Astro.props;
@@ -16,6 +16,7 @@ const nav = [
   { href: '/programs/', label: 'Programs' },
   { href: '/coaching/', label: 'Coaching' },
   { href: '/insights/', label: 'Insights' },
+  { href: '/reports/', label: 'Reports' },
   { href: '/events/', label: 'Events' },
   { href: '/contact/', label: 'Contact' },
 ];
@@ -54,14 +55,6 @@ const nav = [
   <header class="site-header">
     <div class="nav">
       <a class="brand" href="/" aria-label="Executive AI Institute home">
-        <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-          <circle cx="20" cy="20" r="18.5" stroke="#059669" stroke-width="1.6" opacity="0.55"/>
-          <path d="M11 27 L18.5 19 L24 22.5 L30 12.5" stroke="#A7D8C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="11" cy="27" r="2.6" fill="#059669"/>
-          <circle cx="18.5" cy="19" r="2.6" fill="#059669"/>
-          <circle cx="24" cy="22.5" r="2.6" fill="#059669"/>
-          <circle cx="30" cy="12.5" r="3.2" fill="#FAF8F4"/>
-        </svg>
         <b>Executive AI Institute</b>
       </a>
       <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
@@ -83,15 +76,7 @@ const nav = [
       <div class="foot-grid">
         <div>
           <a class="brand" href="/" style="margin-bottom:16px">
-            <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              <circle cx="20" cy="20" r="18.5" stroke="#059669" stroke-width="1.6" opacity="0.55"/>
-              <path d="M11 27 L18.5 19 L24 22.5 L30 12.5" stroke="#A7D8C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="11" cy="27" r="2.6" fill="#059669"/>
-              <circle cx="18.5" cy="19" r="2.6" fill="#059669"/>
-              <circle cx="24" cy="22.5" r="2.6" fill="#059669"/>
-              <circle cx="30" cy="12.5" r="3.2" fill="#FAF8F4"/>
-            </svg>
-            <b>Executive AI Institute</b>
+            <b style="color:var(--cream)">Executive AI Institute</b>
           </a>
           <p style="max-width:44ch">Leadership for the age of AI. People-first strategy, ethical governance and hands-on capability for senior executives and their organisations.</p>
         </div>
@@ -105,6 +90,7 @@ const nav = [
         <div>
           <h3>Connect</h3>
           <div style="margin:7px 0"><a href="/insights/">Insights</a></div>
+          <div style="margin:7px 0"><a href="/reports/">Reports</a></div>
           <div style="margin:7px 0"><a href="/events/">Events</a></div>
           <div style="margin:7px 0"><a href="/contact/">Contact</a></div>
           <div style="margin:7px 0"><a href="/faq/">FAQ</a></div>

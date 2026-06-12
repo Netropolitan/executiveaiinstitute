@@ -31,7 +31,7 @@ For those of us who have been banging the drum on AI safety for a long time, thi
 This is not just compliance. It is operational maturity for AI.
 
 - **Governance gets real.** You will need documented risk assessments, model cards, evaluation protocols, human-in-the-loop controls, and escalation paths.
-- **Accountability shifts left.** Safety, legal, security, HR, and product must co-own outcomes from design to deployment — not only after a headline.
+- **Accountability shifts left.** Safety, legal, security, HR, and product must co-own outcomes from design to deployment, not only after a headline.
 - **Trust becomes a moat.** Transparent practices reduce legal exposure and raise credibility with employees, applicants, and customers.
 - **Talent implications.** Vendor labels do not remove responsibility. If a tool influences people decisions, your name is still on the door.
 

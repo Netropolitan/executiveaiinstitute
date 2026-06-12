@@ -1,6 +1,6 @@
 ---
 title: "Why \"Soft\" Skills Are Becoming Your Hardest Currency In The Age Of AI"
-description: "As AI advances, human-centric skills like creativity, empathy and judgment are rising in value — reshaping work, leadership and economic growth."
+description: "As AI advances, human-centric skills like creativity, empathy and judgment are rising in value, reshaping work, leadership and economic growth."
 pubDate: 2025-11-19
 author: jamie
 readMinutes: 6
@@ -12,7 +12,7 @@ The sharper question now is different:
 
 > "Are we investing enough in the skills AI cannot copy?"
 
-Because the data is increasingly clear. As AI races ahead, the economic value of deeply human skills is not just holding up — it is accelerating.
+Because the data is increasingly clear. As AI races ahead, the economic value of deeply human skills is holding up, and it is accelerating.
 
 Welcome to the human-centric skills revolution.
 
@@ -35,8 +35,8 @@ What rises in value is everything that is:
 
 Automation risk maps cleanly to this split:
 
-- Creative, care and management roles face very low automation risk — often under 20%
-- Routine and clerical roles frequently sit in the 70–85% risk band
+- Creative, care and management roles face very low automation risk, often under 20%
+- Routine and clerical roles frequently sit in the 70-85% risk band
 
 If your work relies on being human with other humans, you are far safer than the spreadsheet warriors.
 
@@ -56,7 +56,7 @@ AI should be forcing us to count it. We have to build an economic architecture o
 
 ## The half-life problem: why tech skills age faster than humans do
 
-Technical skills still matter — a lot. You would not want a surgeon who has not updated their methods since 2003, or a CTO who thinks "cloud" is a passing fad.
+Technical skills still matter, a lot. You would not want a surgeon who has not updated their methods since 2003, or a CTO who thinks "cloud" is a passing fad.
 
 But the half-life of technical skills has collapsed:
 
@@ -80,7 +80,7 @@ These human capabilities are what let leaders and teams ride the wave, rather th
 
 There is a principle that I believe should anchor any serious policy conversation about AI: **protect people, not jobs**. Jobs will evolve, tasks will shift, whole categories will be reconfigured. That is not the problem. The problem is failing to give people the stability, time and confidence to adapt as work changes around them.
 
-This is where we need to be far bolder. Policy makers should treat income security as an enabler of growth, not a concession. A modern safety net — potentially including forms of universal basic income — would give people the foundation to retrain, move sectors, build new skills, or start new ventures without the fear of falling through the cracks.
+This is where we need to be far bolder. Policy makers should treat income security as an enabler of growth, not a concession. A modern safety net, potentially including forms of universal basic income, would give people the foundation to retrain, move sectors, build new skills, or start new ventures without the fear of falling through the cracks.
 
 The priority should be human mobility, not job preservation. That means:
 
@@ -163,4 +163,4 @@ All anchored in four pillars: ethics, trust, cultural inclusion and measurable i
 If you want to turn this from "interesting" into "operational", take these straight into your next leadership meeting:
 
 - Where in our organisation is uniquely human work already creating outsized value, and how could AI amplify it?
-- Which critical roles depend on creativity, care, judgment or relationship building — and how are we developing those people?
+- Which critical roles depend on creativity, care, judgment or relationship building, and how are we developing those people?

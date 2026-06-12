@@ -1,19 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
-// AI Leadership Roadmap — the rebuilt diagnostic. The original Typebot version
-// asked 36 questions and round-tripped three LLM prompts; this version asks 12
-// (three per dimension), scores deterministically client-side, and renders the
-// full report instantly on the page. The report sections mirror the original
-// 11-section structure. (Research source: research/assessment-flow.txt.)
+// AI Leadership Roadmap. The original Typebot version asked 36 questions and
+// round-tripped three LLM prompts; this version asks 12 (three per dimension),
+// scores deterministically client-side, and renders a scorecard report on the
+// page. Results are gated behind name + work email + company; the details POST
+// to the Brew signup funnel tagged source=roadmap.
+//
+// NOTE: every element the quiz/report injects with JS must be styled in the
+// is:global block below. Astro-scoped styles never match runtime-created nodes.
 ---
-<Base title="AI Leadership Roadmap | Executive AI Institute" description="A free diagnostic for senior leaders: answer 12 questions and get your AI leadership maturity stage, blindspots, opportunities and recommendations — instantly, no sign-up.">
+<Base title="AI Leadership Roadmap | Executive AI Institute" description="A free diagnostic for senior leaders: answer 12 questions and get your AI leadership scorecard with maturity stages, blindspots, opportunities and recommendations.">
   <section class="section container" style="padding-top:160px;padding-bottom:40px">
     <span class="kicker">Free diagnostic · 3 minutes</span>
     <h1 style="max-width:15ch">Your AI Leadership <span class="accent">Roadmap.</span></h1>
     <p class="lead" style="margin-top:24px">
-      Twelve questions across four dimensions — leadership readiness, organisational maturity,
-      culture &amp; adoption, governance &amp; risk. There are no right or wrong answers: your responses
-      reveal strengths, gaps and the next moves on your AI journey. Instant report, no sign-up.
+      Twelve questions across four dimensions: leadership readiness, organisational maturity,
+      culture &amp; adoption, governance &amp; risk. There are no right or wrong answers. Your
+      responses reveal strengths, gaps and the next moves on your AI journey.
     </p>
   </section>
 
@@ -24,13 +27,13 @@ import Base from '../layouts/Base.astro';
         <h2 style="font-size:clamp(24px,2.6vw,34px)">Before we start</h2>
         <p>Answer for the organisation you lead or advise. The diagnostic measures:</p>
         <ul class="dims">
-          <li><b>Leadership readiness</b> — your own grasp of AI and ability to direct it</li>
-          <li><b>Organisational maturity</b> — what your organisation has actually done</li>
-          <li><b>Culture &amp; adoption</b> — how your people respond to change</li>
-          <li><b>Governance &amp; risk</b> — how you manage what can go wrong</li>
+          <li><b>Leadership readiness</b>: your own grasp of AI and ability to direct it</li>
+          <li><b>Organisational maturity</b>: what your organisation has actually done</li>
+          <li><b>Culture &amp; adoption</b>: how your people respond to change</li>
+          <li><b>Governance &amp; risk</b>: how you manage what can go wrong</li>
         </ul>
         <div class="field" style="max-width:420px;margin-top:26px">
-          <label for="orgname">Organisation name <span style="color:var(--faint);text-transform:none;letter-spacing:0">(optional — personalises your report)</span></label>
+          <label for="orgname">Organisation name <span style="color:var(--faint);text-transform:none;letter-spacing:0">(optional, personalises your scorecard)</span></label>
           <input id="orgname" type="text" autocomplete="organization" placeholder="e.g. Meridian Group" />
         </div>
         <button class="btn btn--solid btn--lg" id="startBtn">Begin the diagnostic</button>
@@ -44,12 +47,12 @@ import Base from '../layouts/Base.astro';
         <div class="q-options" id="qOptions" role="group"></div>
       </div>
 
-      <!-- Details gate: report unlocks with name, work email and company -->
+      <!-- Details gate: the scorecard unlocks with name, work email and company -->
       <div class="q-step" data-step="details" hidden>
         <div class="q-progress"><div class="q-bar" style="width:100%"></div></div>
         <p class="q-dim">One last step</p>
-        <h2 style="font-size:clamp(22px,2.4vw,30px)">Your report is ready — who is it for?</h2>
-        <p>We prepare the report under your name and company, and email you a copy so you can share it with your leadership team.</p>
+        <h2 style="font-size:clamp(22px,2.4vw,30px)">Your scorecard is ready. Who is it for?</h2>
+        <p>We prepare the scorecard under your name and company so you can share it with your leadership team.</p>
         <form id="detailsForm" novalidate>
           <div class="two">
             <div class="field">
@@ -67,61 +70,19 @@ import Base from '../layouts/Base.astro';
           </div>
           <!-- Honeypot -->
           <input class="d-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <button class="btn btn--solid btn--lg" type="submit">Show my report</button>
-          <p style="font-size:13px;color:var(--faint);margin:14px 0 0">We'll only use this to send your report and occasional leadership briefings. Unsubscribe any time. <a href="/privacy/">Privacy policy</a>.</p>
+          <button class="btn btn--solid btn--lg" type="submit">Show my scorecard</button>
+          <p style="font-size:13px;color:var(--faint);margin:14px 0 0">We only use this to send your scorecard and occasional leadership briefings. Unsubscribe any time. <a href="/privacy/">Privacy policy</a>.</p>
         </form>
       </div>
     </div>
 
-    <!-- Report -->
-    <div id="report" hidden>
-      <div class="r-head">
-        <span class="kicker">Your report</span>
-        <h2 id="rTitle" style="max-width:20ch">AI Leadership Roadmap</h2>
-        <p class="lead" id="rSummary"></p>
-        <div class="r-actions">
-          <button class="btn btn--ghost" id="printBtn">Save as PDF</button>
-          <button class="btn btn--ghost" id="retakeBtn">Retake</button>
-        </div>
-      </div>
-
-      <div class="r-stages" id="rStages"></div>
-
-      <div class="r-grid">
-        <div class="card">
-          <h3 style="color:var(--sage)">Dimension scores</h3>
-          <div id="rBars"></div>
-        </div>
-        <div class="card">
-          <h3 style="color:var(--sage)">Leadership blindspots</h3>
-          <div id="rBlind"></div>
-        </div>
-        <div class="card">
-          <h3 style="color:var(--sage)">Organisational AI opportunities</h3>
-          <div id="rOpps"></div>
-        </div>
-        <div class="card">
-          <h3 style="color:var(--sage)">The cost of inaction</h3>
-          <div id="rRisk"></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:22px">
-        <h3 style="color:var(--sage)">Recommended next steps</h3>
-        <div id="rRecs"></div>
-      </div>
-
-      <div class="r-cta">
-        <h2 style="max-width:20ch">Want this turned into a plan?</h2>
-        <p class="lead" style="margin-bottom:28px">Book a complimentary 30-minute debrief and we'll walk your report, pressure-test the findings and map your first 90 days.</p>
-        <a class="btn btn--solid btn--lg" href="/contact/">Book a debrief</a>
-      </div>
-    </div>
+    <!-- Scorecard report (all inner markup injected by the script below) -->
+    <div id="report" hidden></div>
   </section>
 </Base>
 
 <script>
-  // ── Question bank: 4 dimensions × 3 questions, options scored 0–3 ──
+  // ── Question bank: 4 dimensions × 3 questions, options scored 0-3 ──
   const DIMS = ['Leadership readiness', 'Organisational maturity', 'Culture & adoption', 'Governance & risk'];
   const QS = [
     { d: 0, q: 'How confident are you in explaining core AI concepts to your team?',
@@ -135,15 +96,15 @@ import Base from '../layouts/Base.astro';
     { d: 1, q: 'How well do you understand your organisation’s data, technology and process limits for deploying AI?',
       o: ['Not at all', 'A rough sense', 'Mapped for key functions', 'Mapped, owned and regularly reviewed'] },
     { d: 1, q: 'When planning AI initiatives, how often are they linked to specific KPIs or ROI targets?',
-      o: ['Never — we haven’t planned any', 'Rarely', 'Usually', 'Always — it’s a gate for funding'] },
+      o: ['Never, we haven’t planned any', 'Rarely', 'Usually', 'Always, it’s a gate for funding'] },
     { d: 2, q: 'How does your organisation react when someone says “we should try AI”?',
-      o: ['Resistant — not interested', 'Resistant but curious — needs proof', 'Open with caution — needs more info', 'Very open — let’s do it'] },
+      o: ['Resistant, not interested', 'Resistant but curious, needs proof', 'Open with caution, needs more info', 'Very open, let’s do it'] },
     { d: 2, q: 'How easily does your team pick up new digital skills?',
       o: ['Very hard', 'Somewhat hard', 'Somewhat easy', 'Very easy'] },
     { d: 2, q: 'How often do teams share tips and help each other with new tools?',
       o: ['Never', 'Sometimes', 'Often', 'Always'] },
     { d: 3, q: 'Which best describes your approach to managing AI-related risks?',
-      o: ['We haven’t considered them', 'Ad hoc — handled if they appear', 'Defined guidelines for key risks', 'A living governance framework with clear owners'] },
+      o: ['We haven’t considered them', 'Ad hoc, handled if they appear', 'Defined guidelines for key risks', 'A living governance framework with clear owners'] },
     { d: 3, q: 'How often do you invite outside experts or sceptics to challenge your AI plans?',
       o: ['Never', 'Rarely', 'Sometimes', 'Frequently'] },
     { d: 3, q: 'How are mistakes made with a new tool treated?',
@@ -152,45 +113,53 @@ import Base from '../layouts/Base.astro';
 
   const LEAD_STAGES = ['Emerging', 'Strategic', 'Governance', 'Transformative'];
   const ORG_STAGES = ['Exploratory', 'Foundational', 'Integrated', 'Transformational'];
-  const ADOPT_STAGES = ['Unaware', 'Skepticism', 'Exploration & piloting', 'Adoption & integration', 'Institutionalised'];
+  const ADOPT_STAGES = ['Unaware', 'Skepticism', 'Exploration', 'Adoption', 'Institutionalised'];
   const TRAIN_STAGES = ['Awareness & strategy', 'Leadership development', 'Organisational capability', 'Continuous learning'];
+  const GRADES = [
+    { min: 0.85, g: 'A', label: 'Front-runner' },
+    { min: 0.65, g: 'B', label: 'Building momentum' },
+    { min: 0.45, g: 'C', label: 'Ready to move' },
+    { min: 0.25, g: 'D', label: 'Early days' },
+    { min: 0, g: 'E', label: 'Starting line' },
+  ];
 
   const BLIND = [
-    { h: 'Fluency gap', b: 'Leadership conviction is running ahead of leadership understanding — strategy set today will be inherited from vendors, not chosen.' },
-    { h: 'Invisible foundations', b: 'Ambition is outpacing knowledge of your own data, process and technology limits — the most common cause of stalled pilots.' },
+    { h: 'Fluency gap', b: 'Leadership conviction is running ahead of leadership understanding. Strategy set today will be inherited from vendors, not chosen.' },
+    { h: 'Invisible foundations', b: 'Ambition is outpacing knowledge of your own data, process and technology limits. This is the most common cause of stalled pilots.' },
     { h: 'Quiet resistance', b: 'Initiatives are being green-lit faster than the culture can absorb them; adoption will lag announcement.' },
-    { h: 'Unowned risk', b: 'No one is formally accountable for AI risk — fine until the first incident, expensive afterwards.' },
+    { h: 'Unowned risk', b: 'No one is formally accountable for AI risk. Fine until the first incident, expensive afterwards.' },
   ];
   const OPPS = [
-    { h: 'Leadership upskilling', b: 'A structured executive AI fluency program converts enthusiasm into judgement — the fastest-compounding investment available to you.' },
+    { h: 'Leadership upskilling', b: 'A structured executive AI fluency program converts enthusiasm into judgement. It is the fastest-compounding investment available to you.' },
     { h: 'Process quick wins', b: 'Manual, repeatable work in your operations is the natural first deployment: visible value in weeks, low risk, high learning.' },
-    { h: 'Champion network', b: 'Your most curious people are an unbuilt asset — a champions program turns scattered experimentation into organisational capability.' },
-    { h: 'Governance as advantage', b: 'Codifying how you evaluate, approve and monitor AI use builds the trust — internal and external — that accelerates everything else.' },
+    { h: 'Champion network', b: 'Your most curious people are an unbuilt asset. A champions program turns scattered experimentation into organisational capability.' },
+    { h: 'Governance as advantage', b: 'Codifying how you evaluate, approve and monitor AI use builds the trust, internal and external, that accelerates everything else.' },
   ];
   const RECS = [
     { h: 'Executive briefing', b: 'Run a cost-of-inaction briefing with the full leadership team to build a shared, realistic baseline.' },
     { h: 'Readiness audit', b: 'Map your data, technology and process constraints before committing to any flagship initiative.' },
     { h: 'Pilot with guardrails', b: 'Launch one scoped pilot tied to a named KPI, with oversight rules agreed before kick-off.' },
-    { h: 'Capability cadence', b: 'Stand up a regular upskilling rhythm — micro-labs, not one-off training days — so capability compounds.' },
+    { h: 'Capability cadence', b: 'Stand up a regular upskilling rhythm. Micro-labs, not one-off training days, so capability compounds.' },
   ];
   const RISKS = [
-    ['Within 1 year', 'Operational inefficiencies persist while competitors automate; the best digitally-fluent talent starts choosing employers who are visibly moving.'],
-    ['Within 3 years', 'Competitive dynamics shift: rivals price and respond on AI-assisted cost curves you cannot match, and market share erosion accelerates.'],
-    ['Within 5 years', 'Strategic obsolescence sets in — product cycles, customer expectations and margins are set by AI-native operators in your sector.'],
-    ['Within 10 years', 'Catch-up costs exceed transformation costs several times over; the question becomes viability, not advantage.'],
+    ['1 year', 'Operational inefficiencies persist while competitors automate; the best digitally-fluent talent starts choosing employers who are visibly moving.'],
+    ['3 years', 'Competitive dynamics shift: rivals price and respond on AI-assisted cost curves you cannot match, and market share erosion accelerates.'],
+    ['5 years', 'Strategic obsolescence sets in. Product cycles, customer expectations and margins are set by AI-native operators in your sector.'],
+    ['10 years', 'Catch-up costs exceed transformation costs several times over; the question becomes viability, not advantage.'],
   ];
 
   // ── State ──
   const answers = new Array(QS.length).fill(-1);
   let idx = 0;
   let org = '';
+  let person = '';
 
-  // Lead capture: results unlock with name + work email + company. Submissions
-  // post to the Brew signup funnel (same route as Subscribe) tagged
-  // source=roadmap; network failure never blocks the report.
+  // Lead capture posts to the Brew signup funnel tagged source=roadmap.
+  // Network failure never blocks the scorecard.
   const LEAD_ENDPOINT = 'https://kamino.taila07ff3.ts.net/eaii-signup/2bd446c001536638f15b1901a3851dd2';
 
   const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const introEl = document.querySelector('[data-step="intro"]');
   const qEl = document.querySelector('[data-step="question"]');
   const detailsEl = document.querySelector('[data-step="details"]');
@@ -208,16 +177,17 @@ import Base from '../layouts/Base.astro';
     if (!f.reportValidity()) return;
     const d = new FormData(f);
     if (d.get('website')) return; // honeypot tripped
+    person = String(d.get('name') || '').trim();
     if (!org) org = String(d.get('company') || '').trim();
     fetch(LEAD_ENDPOINT, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: String(d.get('email') || '').trim(),
-        name: String(d.get('name') || '').trim(),
+        name: person,
         company: String(d.get('company') || '').trim(),
         source: 'roadmap',
       }),
-    }).catch(() => { /* never block the report on network */ });
+    }).catch(() => { /* never block the scorecard on network */ });
     detailsEl?.setAttribute('hidden', '');
     report();
   });
@@ -233,13 +203,12 @@ import Base from '../layouts/Base.astro';
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'q-opt';
-      b.textContent = opt;
+      b.innerHTML = `<span class="q-opt-key">${String.fromCharCode(65 + score)}</span><span>${esc(opt)}</span>`;
       b.addEventListener('click', () => {
         answers[idx] = score;
         idx += 1;
         if (idx < QS.length) renderQ();
         else {
-          // All questions answered — gate the report behind contact details
           qEl?.setAttribute('hidden', '');
           detailsEl?.removeAttribute('hidden');
           (document.getElementById('dName') as HTMLInputElement)?.focus({ preventScroll: true });
@@ -253,150 +222,353 @@ import Base from '../layouts/Base.astro';
   const stageOf = (pct, stages) => stages[Math.min(stages.length - 1, Math.floor(pct * stages.length))];
 
   function report() {
-    // Dimension scores 0–9 → percentages
     const dims = [0, 1, 2, 3].map((d) =>
       QS.reduce((sum, q, i) => sum + (q.d === d ? answers[i] : 0), 0) / 9
     );
     const total = dims.reduce((a, b) => a + b, 0) / 4;
+    const pct = Math.round(total * 100);
+    const grade = GRADES.find((g) => total >= g.min);
 
     const lead = stageOf(dims[0], LEAD_STAGES);
     const orgStage = stageOf(dims[1], ORG_STAGES);
     const adopt = stageOf((dims[1] + dims[2]) / 2, ADOPT_STAGES);
     const train = stageOf((dims[0] + dims[2]) / 2, TRAIN_STAGES);
 
+    const order = dims.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]).map(([, i]) => i);
+    const weakest = DIMS[order[0]].toLowerCase();
+    const strongest = DIMS[order[3]].toLowerCase();
+    const horizon = total < 0.34 ? 4 : total < 0.6 ? 3 : 2;
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Gauge geometry: 270° arc, r=84
+    const R = 84, CIRC = 2 * Math.PI * R, ARC = CIRC * 0.75;
+
+    const stageCard = (label, val, stages, i) => `
+      <div class="sc-stage" style="animation-delay:${0.15 + i * 0.12}s">
+        <span class="sc-stage-label">${label}</span>
+        <span class="sc-stage-val">${val}</span>
+        <span class="sc-steps">${stages.map((s) => `<i class="${s === val ? 'on' : ''}" title="${esc(s)}"></i>`).join('')}</span>
+        <span class="sc-stage-pos">Stage ${stages.indexOf(val) + 1} of ${stages.length}</span>
+      </div>`;
+
+    const item = (x, n) => `
+      <div class="sc-item" style="animation-delay:${0.2 + n * 0.1}s">
+        <b>${esc(x.h)}</b><p>${esc(x.b)}</p>
+      </div>`;
+
+    $('report').innerHTML = `
+      <div class="sc-frame">
+        <header class="sc-head">
+          <div>
+            <p class="sc-kicker">AI Leadership Scorecard</p>
+            <h2 class="sc-title">${esc(org || 'Your organisation')}</h2>
+            <p class="sc-sub">Prepared for ${esc(person || 'you')} · ${today}</p>
+          </div>
+          <div class="sc-actions">
+            <button class="btn btn--ghost" id="printBtn">Save as PDF</button>
+            <button class="btn btn--ghost" id="retakeBtn">Retake</button>
+          </div>
+        </header>
+
+        <div class="sc-hero">
+          <div class="sc-gauge">
+            <svg viewBox="0 0 200 200">
+              <g transform="rotate(135 100 100)">
+                <circle cx="100" cy="100" r="${R}" fill="none" stroke="rgba(167,216,196,0.12)" stroke-width="14"
+                  stroke-dasharray="${ARC} ${CIRC}" stroke-linecap="round"/>
+                <circle id="gaugeArc" cx="100" cy="100" r="${R}" fill="none" stroke="url(#gaugeGrad)" stroke-width="14"
+                  stroke-dasharray="0 ${CIRC}" stroke-linecap="round"/>
+              </g>
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0" stop-color="#065f46"/>
+                  <stop offset="1" stop-color="#34d399"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="sc-gauge-centre">
+              <span class="sc-score"><span id="scoreNum">0</span><small>%</small></span>
+              <span class="sc-score-label">overall readiness</span>
+            </div>
+          </div>
+          <div class="sc-verdict">
+            <span class="sc-grade">${grade.g}</span>
+            <h3 class="sc-grade-label">${grade.label}</h3>
+            <p>Your strongest dimension is <b>${esc(strongest)}</b>. The one that will repay attention
+            first is <b>${esc(weakest)}</b>. You sit at the <b>${esc(adopt.toLowerCase())}</b> phase of the
+            change curve, and the moves below are sequenced to take you to the next stage.</p>
+          </div>
+        </div>
+
+        <div class="sc-stages">
+          ${stageCard('Leadership maturity', lead, LEAD_STAGES, 0)}
+          ${stageCard('Organisational maturity', orgStage, ORG_STAGES, 1)}
+          ${stageCard('Change adoption', adopt, ADOPT_STAGES, 2)}
+          ${stageCard('Training & capability', train, TRAIN_STAGES, 3)}
+        </div>
+
+        <div class="sc-panel sc-dims">
+          <h3 class="sc-panel-title">Dimension scores</h3>
+          ${dims.map((v, i) => `
+            <div class="sc-bar-row">
+              <span class="sc-bar-name">${DIMS[i]}</span>
+              <div class="sc-bar"><div class="sc-bar-fill" data-w="${Math.max(4, v * 100)}" style="transition-delay:${0.3 + i * 0.15}s"></div></div>
+              <b class="sc-bar-val">${Math.round(v * 100)}%</b>
+            </div>`).join('')}
+        </div>
+
+        <div class="sc-grid">
+          <div class="sc-panel">
+            <h3 class="sc-panel-title">Leadership blindspots</h3>
+            ${order.slice(0, 2).map((i, n) => item(BLIND[i], n)).join('')}
+          </div>
+          <div class="sc-panel">
+            <h3 class="sc-panel-title">Where the value is</h3>
+            ${[OPPS[order[0]], OPPS[order[3]]].map((x, n) => item(x, n)).join('')}
+          </div>
+        </div>
+
+        <div class="sc-panel">
+          <h3 class="sc-panel-title">The cost of inaction</h3>
+          <div class="sc-timeline">
+            ${RISKS.slice(0, horizon).map(([h, b], n) => `
+              <div class="sc-tl-item" style="animation-delay:${0.2 + n * 0.12}s">
+                <span class="sc-tl-when">${h}</span>
+                <p>${b}</p>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <div class="sc-panel">
+          <h3 class="sc-panel-title">Recommended next steps</h3>
+          <div class="sc-recs">
+            ${[...new Set([order[0], 0, order[1], order[2]])].slice(0, 4).map((i, n) => `
+              <div class="sc-rec" style="animation-delay:${0.15 + n * 0.12}s">
+                <span class="sc-rec-n">${n + 1}</span>
+                <div><b>${esc(RECS[i].h)}</b><p>${esc(RECS[i].b)}</p></div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <div class="sc-cta">
+          <h2 style="max-width:20ch;margin-inline:auto">Want this turned into a plan?</h2>
+          <p class="lead" style="margin:14px auto 28px">Book a complimentary 30-minute debrief. We walk your scorecard with you, pressure-test the findings and map your first 90 days.</p>
+          <a class="btn btn--solid btn--lg" href="/contact/">Book a debrief</a>
+        </div>
+      </div>`;
+
     document.getElementById('quiz').hidden = true;
     const rep = $('report');
     rep.hidden = false;
 
-    $('rTitle').textContent = org ? `${org}: AI Leadership Roadmap` : 'Your AI Leadership Roadmap';
-    const weakest = DIMS[dims.indexOf(Math.min(...dims))].toLowerCase();
-    const strongest = DIMS[dims.indexOf(Math.max(...dims))].toLowerCase();
-    $('rSummary').textContent =
-      `Overall readiness: ${(total * 100).toFixed(0)}%. Your leadership maturity reads as ${lead.toLowerCase()}, ` +
-      `your organisation as ${orgStage.toLowerCase()}, and you sit at the ${adopt.toLowerCase()} phase of the change curve. ` +
-      `Your strongest dimension is ${strongest}; the one that will repay attention first is ${weakest}.`;
+    // Animate: gauge sweep + score count-up + bar fills
+    requestAnimationFrame(() => {
+      const arc = document.getElementById('gaugeArc');
+      if (arc) {
+        arc.style.transition = 'stroke-dasharray 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
+        requestAnimationFrame(() => arc.setAttribute('stroke-dasharray', `${ARC * total} ${CIRC}`));
+      }
+      document.querySelectorAll('.sc-bar-fill').forEach((el) => {
+        requestAnimationFrame(() => { (el as HTMLElement).style.width = el.getAttribute('data-w') + '%'; });
+      });
+      const num = document.getElementById('scoreNum');
+      const t0 = performance.now();
+      const tick = (t) => {
+        const p = Math.min(1, (t - t0) / 1400);
+        const eased = 1 - Math.pow(1 - p, 3);
+        if (num) num.textContent = String(Math.round(pct * eased));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
 
-    $('rStages').innerHTML = [
-      ['Leadership maturity', lead, LEAD_STAGES],
-      ['Organisational maturity', orgStage, ORG_STAGES],
-      ['Change adoption', adopt, ADOPT_STAGES],
-      ['Training & capability', train, TRAIN_STAGES],
-    ].map(([label, val, stages]) => `
-      <div class="stage card">
-        <span class="stage-label">${label}</span>
-        <span class="stage-val">${val}</span>
-        <span class="stage-scale">${(stages as string[]).map((s) => `<i class="${s === val ? 'on' : ''}"></i>`).join('')}</span>
-      </div>`).join('');
-
-    $('rBars').innerHTML = dims.map((v, i) => `
-      <div class="bar-row">
-        <span>${DIMS[i]}</span>
-        <div class="bar"><div style="width:${Math.max(4, v * 100)}%"></div></div>
-        <b>${(v * 100).toFixed(0)}%</b>
-      </div>`).join('');
-
-    // Blindspots: the two weakest dimensions. Opportunities: weakest + strongest
-    // (build on strength). Recommendations: ordered weakest-first; upskilling
-    // always present (RECS[0] covers leadership).
-    const order = dims.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]).map(([, i]) => i);
-    const item = (x) => `<div class="r-item"><b>${x.h}</b><p>${x.b}</p></div>`;
-    $('rBlind').innerHTML = order.slice(0, 2).map((i) => item(BLIND[i])).join('');
-    $('rOpps').innerHTML = [OPPS[order[0]], OPPS[order[3]]].map(item).join('');
-    $('rRecs').innerHTML = `<div class="recs">${[...new Set([order[0], 0, order[1], order[2]])].slice(0, 4)
-      .map((i, n) => `<div class="r-item"><b><span class="rec-n">${n + 1}</span>${RECS[i].h}</b><p>${RECS[i].b}</p></div>`).join('')}</div>`;
-
-    // Inaction risk scales with how early-stage the org is
-    const horizon = total < 0.34 ? 4 : total < 0.6 ? 3 : 2;
-    $('rRisk').innerHTML = RISKS.slice(0, horizon).map(([h, b]) => `<div class="r-item"><b>${h}</b><p>${b}</p></div>`).join('');
+    document.getElementById('printBtn')?.addEventListener('click', () => window.print());
+    document.getElementById('retakeBtn')?.addEventListener('click', () => {
+      answers.fill(-1); idx = 0;
+      rep.hidden = true;
+      rep.innerHTML = '';
+      document.getElementById('quiz').hidden = false;
+      introEl?.removeAttribute('hidden');
+      qEl?.setAttribute('hidden', '');
+      detailsEl?.setAttribute('hidden', '');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     rep.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-
-  $('printBtn')?.addEventListener('click', () => window.print());
-  $('retakeBtn')?.addEventListener('click', () => {
-    answers.fill(-1); idx = 0;
-    $('report').hidden = true;
-    document.getElementById('quiz').hidden = false;
-    introEl?.removeAttribute('hidden');
-    qEl?.setAttribute('hidden', '');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
 </script>
 
-<style>
+<!-- Global on purpose: the quiz options and the entire scorecard are injected
+     at runtime, so Astro-scoped selectors would never match them. -->
+<style is:global>
   .quiz { max-width: 780px; margin: 0 auto; min-height: 380px; }
   .dims { list-style: none; padding: 0; margin: 0; }
   .dims li { padding: 10px 0 10px 26px; border-bottom: 1px solid var(--line); color: var(--mist); position: relative; font-size: 15.5px; }
   .dims li::before { content: '→'; position: absolute; left: 0; color: var(--emerald); font-weight: 700; }
   .dims b { color: var(--cream); }
+  #startBtn { margin-top: 6px; }
 
   .q-progress { height: 4px; background: var(--line); border-radius: 2px; margin-bottom: 30px; overflow: hidden; }
   .q-bar { height: 100%; background: linear-gradient(90deg, var(--forest), var(--emerald)); transition: width 0.35s ease; }
   .q-dim { font-size: 12.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--emerald); margin-bottom: 10px; }
   .q-options { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
   .q-opt {
+    display: flex; align-items: center; gap: 16px;
     font: 500 16px/1.45 var(--font);
     text-align: left;
     color: var(--cream);
-    background: var(--onyx);
+    background: rgba(167, 216, 196, 0.04);
     border: 1.5px solid var(--line-strong);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 16px 20px;
     cursor: pointer;
     transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
   }
-  .q-opt:hover, .q-opt:focus-visible { border-color: var(--emerald); background: rgba(5, 150, 105, 0.1); transform: translateX(4px); outline: none; }
+  .q-opt:hover, .q-opt:focus-visible {
+    border-color: var(--emerald);
+    background: rgba(5, 150, 105, 0.12);
+    transform: translateX(6px);
+    outline: none;
+  }
+  .q-opt-key {
+    flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 9px;
+    border: 1.5px solid var(--line-strong);
+    color: var(--sage); font-size: 13px; font-weight: 700;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .q-opt:hover .q-opt-key, .q-opt:focus-visible .q-opt-key { background: var(--emerald); border-color: var(--emerald); color: #fff; }
 
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 480px) { .two { grid-template-columns: 1fr; } }
   .d-hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
 
-  .r-head { max-width: 820px; margin: 20px auto 36px; text-align: center; }
-  .r-head .kicker { justify-content: center; }
-  .r-head .lead { margin-inline: auto; }
-  .r-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+  /* ── Scorecard ───────────────────────────────────────────── */
+  @keyframes sc-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  .sc-frame { max-width: 980px; margin: 0 auto; }
+  .sc-head {
+    display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; justify-content: space-between;
+    padding-bottom: 26px; border-bottom: 1px solid var(--line); margin-bottom: 34px;
+    animation: sc-rise 0.6s ease both;
+  }
+  .sc-kicker { font-size: 12.5px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--emerald); margin: 0 0 10px; }
+  .sc-title { font-size: clamp(28px, 3.6vw, 46px); margin: 0; }
+  .sc-sub { font-size: 14px; color: var(--faint); margin: 8px 0 0; }
+  .sc-actions { display: flex; gap: 10px; }
+  .sc-actions .btn { padding: 12px 20px; font-size: 14px; }
 
-  .r-stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
-  @media (max-width: 1000px) { .r-stages { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .r-stages { grid-template-columns: 1fr; } }
-  .stage { padding: 22px; display: flex; flex-direction: column; gap: 8px; }
-  .stage-label { font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
-  .stage-val { font-size: clamp(20px, 1.8vw, 24px); font-weight: 700; color: var(--sage); letter-spacing: -0.01em; }
-  .stage-scale { display: flex; gap: 5px; margin-top: 6px; }
-  .stage-scale i { height: 5px; flex: 1; border-radius: 3px; background: var(--line-strong); }
-  .stage-scale i.on { background: var(--emerald); box-shadow: 0 0 12px var(--glow); }
-
-  .r-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  @media (max-width: 860px) { .r-grid { grid-template-columns: 1fr; } }
-
-  .bar-row { display: grid; grid-template-columns: 1fr 140px 44px; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
-  .bar-row:last-child { border-bottom: 0; }
-  .bar-row span { color: var(--mist); }
-  .bar-row b { color: var(--sage); text-align: right; }
-  .bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
-  .bar div { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--forest), var(--emerald)); }
-
-  .r-item { padding: 14px 0; border-bottom: 1px solid var(--line); }
-  .r-item:last-child { border-bottom: 0; }
-  .r-item b { color: var(--cream); display: block; margin-bottom: 4px; }
-  .r-item p { margin: 0; font-size: 15px; }
-  .rec-n {
+  .sc-hero {
+    display: grid; grid-template-columns: 280px 1fr; gap: clamp(26px, 4vw, 60px); align-items: center;
+    padding: clamp(26px, 3.5vw, 46px);
+    border: 1px solid var(--line-strong); border-radius: 22px;
+    background:
+      radial-gradient(110% 140% at 0% 0%, rgba(5, 150, 105, 0.16), transparent 55%),
+      linear-gradient(160deg, var(--pine), var(--onyx));
+    animation: sc-rise 0.6s 0.05s ease both;
+  }
+  @media (max-width: 760px) { .sc-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
+  .sc-gauge { position: relative; width: 100%; max-width: 280px; }
+  .sc-gauge svg { width: 100%; display: block; }
+  .sc-gauge-centre {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  }
+  .sc-score { font-size: clamp(44px, 5vw, 60px); font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--cream); }
+  .sc-score small { font-size: 0.45em; color: var(--sage); font-weight: 700; }
+  .sc-score-label { font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); }
+  .sc-grade {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 26px; height: 26px; border-radius: 50%;
-    border: 1.5px solid var(--emerald); color: var(--emerald);
-    font-size: 13px; margin-right: 10px;
+    width: 64px; height: 64px; border-radius: 18px;
+    background: linear-gradient(135deg, var(--forest), var(--emerald));
+    color: #fff; font-size: 34px; font-weight: 700;
+    box-shadow: 0 14px 40px -14px var(--glow);
+    margin-bottom: 16px;
+  }
+  .sc-grade-label { font-size: clamp(24px, 2.6vw, 34px); margin: 0 0 12px; }
+  .sc-verdict p { margin: 0; font-size: 16px; }
+  .sc-verdict b { color: var(--sage); }
+
+  .sc-stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 22px; }
+  @media (max-width: 1000px) { .sc-stages { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .sc-stages { grid-template-columns: 1fr; } }
+  .sc-stage {
+    padding: 22px; border: 1px solid var(--line); border-radius: 16px;
+    background: linear-gradient(160deg, var(--pine), var(--onyx));
+    display: flex; flex-direction: column; gap: 8px;
+    animation: sc-rise 0.6s ease both;
+  }
+  .sc-stage-label { font-size: 11.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint); }
+  .sc-stage-val { font-size: clamp(19px, 1.8vw, 23px); font-weight: 700; color: var(--sage); letter-spacing: -0.01em; }
+  .sc-steps { display: flex; gap: 5px; margin-top: 4px; }
+  .sc-steps i { height: 6px; flex: 1; border-radius: 3px; background: var(--line-strong); }
+  .sc-steps i.on { background: var(--emerald); box-shadow: 0 0 12px var(--glow); }
+  .sc-stage-pos { font-size: 12px; color: var(--faint); }
+
+  .sc-panel {
+    margin-top: 22px; padding: clamp(24px, 3vw, 36px);
+    border: 1px solid var(--line); border-radius: 18px;
+    background: linear-gradient(160deg, var(--pine), var(--onyx));
+    animation: sc-rise 0.6s 0.1s ease both;
+  }
+  .sc-panel-title { font-size: 13px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--emerald); margin: 0 0 18px; }
+  .sc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .sc-grid .sc-panel { margin-top: 22px; }
+  @media (max-width: 820px) { .sc-grid { grid-template-columns: 1fr; gap: 0; } }
+
+  .sc-bar-row { display: grid; grid-template-columns: 220px 1fr 52px; align-items: center; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .sc-bar-row:last-child { border-bottom: 0; }
+  .sc-bar-name { color: var(--mist); font-size: 15px; }
+  .sc-bar-val { color: var(--sage); text-align: right; font-size: 15px; }
+  .sc-bar { height: 10px; background: rgba(167, 216, 196, 0.1); border-radius: 5px; overflow: hidden; }
+  .sc-bar-fill {
+    height: 100%; width: 0; border-radius: 5px;
+    background: linear-gradient(90deg, var(--forest), #34d399);
+    transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (max-width: 640px) {
+    .sc-bar-row { grid-template-columns: 1fr 52px; }
+    .sc-bar { grid-column: 1 / -1; }
   }
 
-  .r-cta { text-align: center; margin-top: 70px; }
-  .r-cta h2 { margin-inline: auto; }
-  .r-cta .lead { margin-inline: auto; }
+  .sc-item { padding: 14px 0; border-bottom: 1px solid var(--line); animation: sc-rise 0.6s ease both; }
+  .sc-item:last-child { border-bottom: 0; }
+  .sc-item b { color: var(--cream); display: block; margin-bottom: 4px; }
+  .sc-item p { margin: 0; font-size: 15px; color: var(--mist); }
+
+  .sc-timeline { position: relative; padding-left: 26px; }
+  .sc-timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(to bottom, var(--emerald), rgba(5, 150, 105, 0.1)); }
+  .sc-tl-item { position: relative; padding: 10px 0 18px; animation: sc-rise 0.6s ease both; }
+  .sc-tl-item::before {
+    content: ''; position: absolute; left: -25px; top: 16px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--void); border: 2.5px solid var(--emerald);
+  }
+  .sc-tl-when { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sage); }
+  .sc-tl-item p { margin: 6px 0 0; font-size: 15px; color: var(--mist); }
+
+  .sc-recs { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .sc-recs { grid-template-columns: 1fr; } }
+  .sc-rec { display: flex; gap: 16px; align-items: flex-start; animation: sc-rise 0.6s ease both; }
+  .sc-rec-n {
+    flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--forest), var(--emerald));
+    color: #fff; font-size: 15px; font-weight: 700;
+  }
+  .sc-rec b { color: var(--cream); display: block; margin-bottom: 4px; }
+  .sc-rec p { margin: 0; font-size: 14.5px; color: var(--mist); }
+
+  .sc-cta { text-align: center; margin-top: 64px; animation: sc-rise 0.6s 0.15s ease both; }
 
   @media print {
-    .site-header, .site-footer, .r-actions, .r-cta { display: none !important; }
+    .site-header, .site-footer, .sub-band, .sc-actions, .sc-cta { display: none !important; }
     body { background: #fff; color: #111; }
     body::before { display: none; }
-    .card { border-color: #ccc; background: #fff; }
-    .stage-val, .r-item b { color: #065f46; }
-    .r-item p, .bar-row span { color: #333; }
+    .sc-hero, .sc-stage, .sc-panel { background: #fff; border-color: #ccc; }
+    .sc-title, .sc-score, .sc-stage-val, .sc-item b, .sc-rec b, .sc-grade-label { color: #065f46; }
+    .sc-item p, .sc-rec p, .sc-tl-item p, .sc-verdict p, .sc-bar-name { color: #333; }
+    .sc-frame { max-width: none; }
   }
 </style>

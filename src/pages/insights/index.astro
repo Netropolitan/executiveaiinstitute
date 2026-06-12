@@ -1,16 +1,18 @@
 ---
 import Base from '../../layouts/Base.astro';
-import CoverArt from '../../components/CoverArt.astro';
 import { getCollection } from 'astro:content';
 
+// Deliberately image-free: the index is pure typography. Publishing a post
+// never requires any artwork.
 const AUTHORS = {
-  jamie: { name: 'Jamie Bykov-Brett', img: '/team/jamiebykovbrett.avif' },
-  jonscott: { name: 'Jonscott Turco', img: '/team/jonscott.avif' },
+  jamie: 'Jamie Bykov-Brett',
+  jonscott: 'Jonscott Turco',
 };
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 <Base title="Insights | Executive AI Institute" description="Essays and analysis on AI leadership, organisational change and human-centric transformation from the Executive AI Institute.">
   <section class="section container" style="padding-top:160px;padding-bottom:48px">
@@ -20,39 +22,59 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 
   </section>
 
   <section class="container" style="padding-bottom:120px">
-    <div class="post-grid">
-      {posts.map((p, i) => {
-        const a = AUTHORS[p.data.author];
-        return (
-          <a class={`post ${i === 0 ? 'post--feature' : ''} reveal`} href={`/insights/${p.id}/`}>
-            <CoverArt slug={p.id} height={i === 0 ? 'clamp(240px, 34vw, 420px)' : 'clamp(180px, 22vw, 240px)'} />
-            <div class="post-body">
-              <h2 style={i === 0 ? '' : 'font-size:clamp(20px,2vw,26px)'}>{p.data.title}</h2>
-              <p>{p.data.description}</p>
-              <div class="byline">
-                <img src={a.img} alt="" width="40" height="40" loading="lazy" />
-                <span><b>{a.name}</b><br />{fmt(p.data.pubDate)}{p.data.readMinutes ? ` · ${p.data.readMinutes} min read` : ''}</span>
-              </div>
+    <ol class="post-list">
+      {posts.map((p, i) => (
+        <li>
+          <a class="post reveal" href={`/insights/${p.id}/`}>
+            <span class="post-index" aria-hidden="true">{pad(posts.length - i)}</span>
+            <div class="post-main">
+              <p class="post-meta">{fmt(p.data.pubDate)}{p.data.readMinutes ? ` · ${p.data.readMinutes} min read` : ''} · {AUTHORS[p.data.author]}</p>
+              <h2 class={i === 0 ? 'post-title post-title--feature' : 'post-title'}>{p.data.title}</h2>
+              <p class="post-desc">{p.data.description}</p>
             </div>
+            <span class="post-arrow" aria-hidden="true">→</span>
           </a>
-        );
-      })}
-    </div>
+        </li>
+      ))}
+    </ol>
   </section>
 </Base>
 
 <style>
-  .post-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
-  .post--feature { grid-column: 1 / -1; }
-  @media (max-width: 760px) { .post-grid { grid-template-columns: 1fr; } }
-
-  .post { display: block; color: var(--cream); }
-  .post:hover h2 { color: var(--sage); }
-  .post-body { padding: 22px 6px 0; }
-  .post-body h2 { transition: color 0.2s ease; }
-  .post-body p { font-size: 15.5px; max-width: 70ch; }
-  .byline { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
-  .byline img { border-radius: 50%; width: 40px; height: 40px; object-fit: cover; border: 1.5px solid var(--emerald); }
-  .byline span { font-size: 13px; color: var(--faint); line-height: 1.5; }
-  .byline b { color: var(--mist); }
+  .post-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .post {
+    display: grid;
+    grid-template-columns: 90px 1fr 48px;
+    gap: clamp(18px, 3vw, 44px);
+    align-items: start;
+    padding: clamp(30px, 4vw, 52px) 8px;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream);
+    transition: background 0.2s ease, padding-left 0.2s ease;
+  }
+  .post:hover { background: rgba(5, 150, 105, 0.05); padding-left: 20px; }
+  .post-index {
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    background: linear-gradient(120deg, var(--forest), var(--emerald));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .post-meta {
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--emerald); margin-bottom: 12px;
+  }
+  .post-title { font-size: clamp(22px, 2.6vw, 34px); margin-bottom: 10px; transition: color 0.2s ease; }
+  .post-title--feature { font-size: clamp(26px, 3.4vw, 46px); }
+  .post:hover .post-title { color: var(--sage); }
+  .post-desc { margin: 0; font-size: 16px; max-width: 75ch; }
+  .post-arrow { font-size: 24px; color: var(--emerald); align-self: center; justify-self: end; transition: transform 0.2s ease; }
+  .post:hover .post-arrow { transform: translateX(6px); }
+  @media (max-width: 700px) {
+    .post { grid-template-columns: 1fr 32px; }
+    .post-index { display: none; }
+  }
 </style>
