@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import CoverArt from '../../components/CoverArt.astro';
+import { getCollection } from 'astro:content';
+
+const AUTHORS = {
+  jamie: { name: 'Jamie Bykov-Brett', img: '/team/jamiebykovbrett.avif' },
+  jonscott: { name: 'Jonscott Turco', img: '/team/jonscott.avif' },
+};
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<Base title="Insights | Executive AI Institute" description="Essays and analysis on AI leadership, organisational change and human-centric transformation from the Executive AI Institute.">
+  <section class="section container" style="padding-top:160px;padding-bottom:48px">
+    <span class="kicker">Insights</span>
+    <h1 style="max-width:16ch">Thinking for the <span class="accent">AI era.</span></h1>
+    <p class="lead" style="margin-top:24px">Essays and analysis on AI leadership, organisational change and human-centric transformation.</p>
+  </section>
+
+  <section class="container" style="padding-bottom:120px">
+    <div class="post-grid">
+      {posts.map((p, i) => {
+        const a = AUTHORS[p.data.author];
+        return (
+          <a class={`post ${i === 0 ? 'post--feature' : ''} reveal`} href={`/insights/${p.id}/`}>
+            <CoverArt slug={p.id} height={i === 0 ? 'clamp(240px, 34vw, 420px)' : 'clamp(180px, 22vw, 240px)'} />
+            <div class="post-body">
+              <h2 style={i === 0 ? '' : 'font-size:clamp(20px,2vw,26px)'}>{p.data.title}</h2>
+              <p>{p.data.description}</p>
+              <div class="byline">
+                <img src={a.img} alt="" width="40" height="40" loading="lazy" />
+                <span><b>{a.name}</b><br />{fmt(p.data.pubDate)}{p.data.readMinutes ? ` · ${p.data.readMinutes} min read` : ''}</span>
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .post-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+  .post--feature { grid-column: 1 / -1; }
+  @media (max-width: 760px) { .post-grid { grid-template-columns: 1fr; } }
+
+  .post { display: block; color: var(--cream); }
+  .post:hover h2 { color: var(--sage); }
+  .post-body { padding: 22px 6px 0; }
+  .post-body h2 { transition: color 0.2s ease; }
+  .post-body p { font-size: 15.5px; max-width: 70ch; }
+  .byline { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+  .byline img { border-radius: 50%; width: 40px; height: 40px; object-fit: cover; border: 1.5px solid var(--emerald); }
+  .byline span { font-size: 13px; color: var(--faint); line-height: 1.5; }
+  .byline b { color: var(--mist); }
+</style>

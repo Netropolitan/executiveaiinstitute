@@ -1,0 +1,88 @@
+---
+// "Subscribers" mailing list signup — email only, honeypot spam guard.
+// Posts to the Brew signup funnel route. Mirrors the DR site's /dr-signup
+// pattern (webhook → automation → Subscribers table). The /eaii-signup route +
+// automation get created during the Brew EAII integration; until then the form
+// fails soft with a polite retry message.
+const {
+  heading = 'Stay updated with the latest',
+  blurb = 'Intelligence for AI-era leaders — essays, event invitations and briefings. Email only, unsubscribe any time.',
+} = Astro.props;
+---
+<section class="sub-band" aria-label="Subscribe to updates">
+  <div class="container sub-inner">
+    <div>
+      <span class="kicker">Subscribers</span>
+      <h2 class="sub-h">{heading}</h2>
+      <p class="sub-blurb">{blurb}</p>
+    </div>
+    <form class="sub-form" novalidate>
+      <input class="sub-email" type="email" name="email" placeholder="you@company.com" aria-label="Email address" autocomplete="email" required />
+      <!-- Honeypot: hidden from people; bots that fill it are dropped. -->
+      <input class="sub-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <button class="btn btn--solid" type="submit">Subscribe</button>
+      <p class="sub-note" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .sub-band {
+    border-top: 1px solid var(--line);
+    background:
+      radial-gradient(80% 140% at 90% 0%, rgba(5, 150, 105, 0.14), transparent 55%),
+      var(--onyx);
+    padding: clamp(56px, 7vw, 96px) 0;
+  }
+  .sub-inner { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(28px, 5vw, 80px); align-items: center; }
+  @media (max-width: 860px) { .sub-inner { grid-template-columns: 1fr; } }
+  .sub-h { font-size: clamp(26px, 3vw, 40px); margin-bottom: 8px; }
+  .sub-blurb { margin: 0; font-size: 15.5px; max-width: 52ch; }
+  .sub-form { display: flex; gap: 10px; flex-wrap: wrap; }
+  .sub-email {
+    flex: 1 1 240px; min-width: 0;
+    font: 400 16px/1.4 var(--font);
+    color: var(--cream);
+    background: var(--void);
+    border: 1.5px solid var(--line-strong);
+    border-radius: 12px;
+    padding: 15px 18px;
+    outline: none;
+    transition: border-color 0.18s ease;
+  }
+  .sub-email:focus { border-color: var(--emerald); }
+  .sub-email::placeholder { color: var(--faint); }
+  .sub-hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
+  .sub-note { flex-basis: 100%; font-size: 13.5px; color: var(--sage); min-height: 1.2em; margin: 4px 0 0; }
+</style>
+
+<script>
+  // TODO(brew-integration): replace with the live /eaii-signup funnel token.
+  const ENDPOINT = 'https://kamino.taila07ff3.ts.net/eaii-signup/pending';
+  document.querySelectorAll('.sub-form').forEach((form) => {
+    const note = form.querySelector('.sub-note');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = form as HTMLFormElement;
+      if (!f.checkValidity()) { f.reportValidity(); return; }
+      const email = (f.elements.namedItem('email') as HTMLInputElement).value.trim();
+      const hp = (f.elements.namedItem('website') as HTMLInputElement).value;
+      if (hp) return; // honeypot tripped
+      if (note) note.textContent = 'Subscribing…';
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, website: hp, source: location.pathname }),
+        });
+        const d = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error();
+        f.reset();
+        if (note) note.textContent = (d && d.action === 'duplicate')
+          ? "You're already a subscriber. Thank you."
+          : "You're in. We'll keep you posted.";
+      } catch (err) {
+        if (note) note.textContent = "That didn't go through — please try again in a moment.";
+      }
+    });
+  });
+</script>

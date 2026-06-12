@@ -1,0 +1,259 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroScene from '../components/HeroScene.astro';
+import LogoMarquee from '../components/LogoMarquee.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const pillars = [
+  { t: 'Holistic Expertise', d: 'Leadership psychology and deep technical mastery in one room — strategy that survives contact with the engineering team.' },
+  { t: 'Proven Frameworks', d: 'The HALO operating framework and the Five C’s give your leadership a shared language for AI decisions.' },
+  { t: 'Human-Centric Approach', d: 'Culture, ethics and governance first. Adoption follows trust — never the other way round.' },
+  { t: 'Measurable Impact', d: 'Every engagement is tied to KPIs and ROI targets, from first briefing to enterprise roadmap.' },
+];
+
+const programs = [
+  { n: '01', t: 'Executive Insights', d: 'A high-impact briefing that quantifies the cost of inaction and arms your executives with quick-win AI opportunities.' },
+  { n: '02', t: 'Strategic Momentum Workshop', d: 'Hands-on prompt engineering, generative-AI fundamentals and the 80/20 oversight rule — leaving with live pilot projects.' },
+  { n: '03', t: 'Transformation Masterclass', d: 'A deep-dive that crafts your enterprise AI roadmap: ethics, ROI, governance and human-AI teaming.' },
+  { n: '04', t: 'Follow-On Support', d: 'On-demand coaching, micro-skill labs and curated updates that turn early momentum into sustained advantage.' },
+];
+
+const stats = [
+  { n: '300M', d: 'full-time jobs globally impacted by AI models by 2030' },
+  { n: '90%', d: 'of business leaders say basic AI fluency is now a hiring advantage' },
+  { n: '40%', d: 'efficiency boost for small businesses that implement AI well' },
+  { n: '30%', d: 'of hours worked today could already be automated' },
+];
+
+const testimonials = [
+  { q: 'Jonscott is a true partner for enhancing a progressive corporate culture of leadership. He brings passion and key insights that provoke leadership teams in a way that prepares them for the many challenges we face.', a: 'Dave Assenza', r: 'Senior HR Business Partner, Swiss Re' },
+  { q: 'A strategic, global-thinking business partner who does more in 8 hours than many people accomplish in a week. I would refer any of my clients to Jonscott because he is attentive, smart, informed, and ethical.', a: 'Martha Williams', r: 'Executive Coach' },
+  { q: 'Talking with Jamie is like talking with someone from the future! What truly impresses me is his ability to communicate and connect with others. His enthusiasm is genuine and infectious.', a: 'Kim White', r: 'Organizational Psychologist, Herrmann International' },
+];
+---
+<Base>
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <HeroScene />
+    <div class="container hero-inner">
+      <span class="kicker">Leadership for the age of AI</span>
+      <h1>Lead your organisation<br /><span class="accent">into the AI era.</span></h1>
+      <p class="lead" style="margin:26px 0 38px">
+        AI is the defining shift of our working lives. The Executive AI Institute guides senior
+        leaders through it with people-first strategy — world-class leadership psychology
+        meeting deep technical mastery.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn--solid btn--lg" href="/roadmap/">Build your AI Leadership Roadmap</a>
+        <a class="btn btn--ghost btn--lg" href="/programs/">Explore programs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Clients ──────────────────────────────────────────── -->
+  <section class="clients" aria-label="Our clients">
+    <div class="container" style="text-align:center">
+      <p class="clients-label">Trusted by leaders at</p>
+    </div>
+    <LogoMarquee />
+  </section>
+
+  <!-- ── Why partner ──────────────────────────────────────── -->
+  <section class="section container">
+    <div class="split">
+      <div class="reveal">
+        <span class="kicker">Why partner with us</span>
+        <h2>Two disciplines.<br />One outcome.</h2>
+      </div>
+      <p class="lead reveal">
+        Most AI advisory is either technology without people, or people without technology.
+        We built the Institute to be both: behavioural psychology that moves leadership teams,
+        and engineering depth that ships working systems. Senior leaders leave equipped to
+        innovate responsibly, drive adoption and build trust in AI-powered organisations.
+      </p>
+    </div>
+    <div class="grid-4" style="margin-top:56px">
+      {pillars.map((p, i) => (
+        <article class="card reveal" style={`transition-delay:${i * 70}ms`}>
+          <h3 style="color:var(--sage)">{p.t}</h3>
+          <p style="margin:0;font-size:15.5px">{p.d}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── Programs ─────────────────────────────────────────── -->
+  <section class="section" style="background:var(--onyx);border-block:1px solid var(--line)">
+    <div class="container">
+      <span class="kicker">Core programs</span>
+      <div class="split">
+        <h2 class="reveal">Meet your leaders<br />where they are.</h2>
+        <p class="lead reveal">From a fast-paced strategic primer to deep-dive transformation and ongoing AI coaching — each path blends deep AI expertise with human-centric leadership practice.</p>
+      </div>
+      <div class="prog-list" style="margin-top:48px">
+        {programs.map((p) => (
+          <a class="prog-row reveal" href="/programs/">
+            <span class="prog-n">{p.n}</span>
+            <span class="prog-t">{p.t}</span>
+            <span class="prog-d">{p.d}</span>
+            <span class="prog-arrow" aria-hidden="true">→</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats ────────────────────────────────────────────── -->
+  <section class="section container" aria-label="AI by the numbers">
+    <span class="kicker">AI by the numbers</span>
+    <h2 class="reveal" style="max-width:14ch">The cost of waiting compounds.</h2>
+    <div class="grid-4" style="margin-top:48px">
+      {stats.map((s, i) => (
+        <div class="reveal" style={`transition-delay:${i * 70}ms`}>
+          <div class="stat-number">{s.n}</div>
+          <p style="margin-top:14px;font-size:15.5px">{s.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── Roadmap CTA ──────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-panel reveal">
+        <div>
+          <span class="kicker">Free diagnostic</span>
+          <h2 style="max-width:18ch">Where does your leadership stand on AI?</h2>
+          <p class="lead" style="margin-bottom:30px">Answer a short set of diagnostic questions and get a personalised AI Leadership Roadmap — maturity stage, blindspots, opportunities and next steps. No sign-up required.</p>
+          <a class="btn btn--solid btn--lg" href="/roadmap/">Start the assessment</a>
+        </div>
+        <svg class="cta-art" viewBox="0 0 300 300" fill="none" aria-hidden="true">
+          <circle cx="150" cy="150" r="130" stroke="#0d7555" stroke-width="1.5" opacity="0.6" />
+          <circle cx="150" cy="150" r="92" stroke="#059669" stroke-width="1.5" opacity="0.5" />
+          <path d="M70 210 L130 140 L172 168 L235 75" stroke="#a7d8c4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="70" cy="210" r="9" fill="#059669" />
+          <circle cx="130" cy="140" r="9" fill="#059669" />
+          <circle cx="172" cy="168" r="9" fill="#059669" />
+          <circle cx="235" cy="75" r="12" fill="#faf8f4" />
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Testimonials ─────────────────────────────────────── -->
+  <section class="section container">
+    <span class="kicker">Testimonials</span>
+    <h2 class="reveal">In their words.</h2>
+    <div class="grid-3" style="margin-top:46px">
+      {testimonials.map((t, i) => (
+        <figure class="card quote reveal" style={`transition-delay:${i * 80}ms`}>
+          <blockquote><p>“{t.q}”</p></blockquote>
+          <figcaption>
+            <b>{t.a}</b>
+            <span>{t.r}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── Latest insights ──────────────────────────────────── -->
+  {posts.length > 0 && (
+    <section class="section container" style="padding-top:0">
+      <div class="split" style="align-items:end">
+        <div>
+          <span class="kicker">Insights</span>
+          <h2 class="reveal">Latest thinking.</h2>
+        </div>
+        <a class="see-all" href="/insights/">All insights →</a>
+      </div>
+      <div class="grid-3" style="margin-top:42px">
+        {posts.map((p) => (
+          <a class="card post-card reveal" href={`/insights/${p.id}/`}>
+            <h3>{p.data.title}</h3>
+            <p style="font-size:15px">{p.data.description}</p>
+            <span class="post-meta">{p.data.pubDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}{p.data.readMinutes ? ` · ${p.data.readMinutes} min read` : ''}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .hero { position: relative; min-height: min(92vh, 980px); display: flex; align-items: center; padding: 150px 0 90px; }
+  .hero-inner { position: relative; z-index: 2; max-width: var(--maxw); }
+  .hero-inner h1 { animation: rise 0.9s ease both; }
+  .hero-inner .kicker { animation: rise 0.9s ease both; }
+  .hero-inner .lead { animation: rise 0.9s 0.15s ease both; max-width: 56ch; }
+  .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; animation: rise 0.9s 0.3s ease both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(28px); } }
+
+  .clients { padding: 30px 0 64px; }
+  .clients-label {
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 26px;
+  }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 80px); align-items: start; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 1000px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .grid-4 { grid-template-columns: 1fr; } }
+
+  /* Program index rows */
+  .prog-list { border-top: 1px solid var(--line); }
+  .prog-row {
+    display: grid;
+    grid-template-columns: 70px 320px 1fr 40px;
+    gap: 24px;
+    align-items: center;
+    padding: 30px 8px;
+    border-bottom: 1px solid var(--line);
+    color: var(--cream);
+    transition: background 0.2s ease, padding-left 0.2s ease;
+  }
+  .prog-row:hover { background: rgba(5, 150, 105, 0.06); padding-left: 18px; }
+  .prog-n { font-size: 14px; font-weight: 700; color: var(--emerald); letter-spacing: 0.1em; }
+  .prog-t { font-size: clamp(19px, 1.8vw, 24px); font-weight: 700; letter-spacing: -0.01em; }
+  .prog-d { font-size: 15px; color: var(--mist); }
+  .prog-arrow { font-size: 22px; color: var(--emerald); justify-self: end; transition: transform 0.2s ease; }
+  .prog-row:hover .prog-arrow { transform: translateX(6px); }
+  @media (max-width: 860px) {
+    .prog-row { grid-template-columns: 44px 1fr 28px; }
+    .prog-d { grid-column: 2; }
+  }
+
+  .cta-panel {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: clamp(30px, 5vw, 70px);
+    align-items: center;
+    border: 1px solid var(--line-strong);
+    border-radius: 24px;
+    padding: clamp(36px, 5vw, 72px);
+    background:
+      radial-gradient(90% 120% at 100% 0%, rgba(5, 150, 105, 0.18), transparent 55%),
+      linear-gradient(160deg, var(--pine), var(--onyx));
+  }
+  .cta-art { width: 100%; max-width: 300px; justify-self: center; }
+  @media (max-width: 860px) { .cta-panel { grid-template-columns: 1fr; } .cta-art { display: none; } }
+
+  .quote { display: flex; flex-direction: column; }
+  .quote blockquote { margin: 0 0 22px; }
+  .quote blockquote p { font-size: 16px; line-height: 1.7; color: var(--mist); font-style: italic; }
+  .quote figcaption { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
+  .quote figcaption b { color: var(--cream); }
+  .quote figcaption span { font-size: 13.5px; color: var(--faint); }
+
+  .post-card h3 { margin-bottom: 10px; }
+  .post-card { display: flex; flex-direction: column; }
+  .post-meta { margin-top: auto; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--emerald); }
+  .see-all { font-weight: 700; color: var(--emerald); margin-bottom: 14px; }
+  .see-all:hover { color: var(--sage); }
+</style>

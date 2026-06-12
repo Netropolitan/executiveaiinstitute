@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+// FAQ — kept deliberately structured (consistent terminology, concise Q&A) so
+// both humans and AI systems ingest it cleanly. FAQPage JSON-LD included.
+const faqs = [
+  { q: 'What is the Executive AI Institute?', a: 'EAII is a leadership academy that equips senior executives with people-first AI strategies and frameworks to navigate enterprise AI transformation.' },
+  { q: 'Who should participate in EAII programs?', a: 'C-suite and senior leaders aiming to understand AI’s business impact, build ethical and inclusive AI cultures, and drive rapid, scalable AI deployments.' },
+  { q: 'What core programs does EAII offer?', a: 'Executive Insights (a briefing on AI’s cost of inaction and quick-win use cases); the Strategic Momentum Workshop (hands-on generative AI, prompt engineering and oversight models); the Transformation Intensive Masterclass (ethics, governance, ROI modelling and human-AI teaming); and Ongoing Support (micro-skill labs, coaching and curated AI updates).' },
+  { q: 'How long does each program take?', a: 'Executive Insights runs 2–4 hours, the Strategic Momentum Workshop is a half-day, and the Transformation Masterclass is a full day. Ongoing Support is a continuous engagement.' },
+  { q: 'Who leads EAII?', a: 'Jonscott Turco, CEO of HumINx and global C-suite AI advisor with 25+ years’ experience, and Jamie Bykov-Brett, award-winning innovator in AI, XR and human-centric design.' },
+  { q: 'What makes EAII’s approach human-centric?', a: 'We embed the Five C’s — Critical Thinking, Creativity, Communication, Collaboration and Curiosity — into every program, complementing technical skill with the leadership capabilities no algorithm replicates.' },
+  { q: 'What is the AI Leadership Roadmap?', a: 'A free 12-question diagnostic on this site. It scores your leadership readiness, organisational maturity, culture and governance, and returns an instant report with blindspots, opportunities and recommended next steps — no sign-up required.' },
+  { q: 'What are Halo Clients?', a: 'Halo Clients engage EAII for long-term consulting partnerships: multi-month advisory retainers, customised AI strategy development, and priority access to new frameworks and expert support.' },
+  { q: 'What partnership models are available?', a: 'Strategic Partners refer executives to EAII programs for commissions and co-marketing. Event Collaborators host open-enrolment workshops and split profits. Investors join advisory sessions, gain performance insights and secure co-branding.' },
+  { q: 'How is EAII’s delivery model structured?', a: 'A hybrid of in-person or virtual workshops, on-demand digital modules, and continuous advisory with micro-coaching.' },
+  { q: 'Where are EAII programs available?', a: 'Global cohorts with regional pilots in North America, EMEA and APAC. Local Event Collaborators extend our reach.' },
+  { q: 'Can EAII customise content for our industry?', a: 'Yes. We collaborate with your subject-matter experts to tailor modules, case studies and exercises to your sector’s challenges, including fully private cohorts on your schedule.' },
+  { q: 'How do you measure ROI for participants?', a: 'A standardised ROI dashboard tracks KPIs — time saved, cost reductions and revenue uplift — with post-program assessments.' },
+  { q: 'How is data privacy and security handled?', a: 'We comply with GDPR, CCPA and ISO 27001. All data is encrypted in transit and at rest; custom NDAs and data-protection addenda are available.' },
+  { q: 'How do I enrol or partner with EAII?', a: 'Use the contact page for enrolment, partnership or investor enquiries — we reply personally, usually within one working day.' },
+];
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question', name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+});
+---
+<Base title="FAQ | Executive AI Institute" description="Frequently asked questions about Executive AI Institute programs, coaching, partnerships, pricing and delivery.">
+  <script type="application/ld+json" set:html={jsonLd} />
+  <section class="section container" style="padding-top:160px">
+    <span class="kicker">FAQ</span>
+    <h1 style="max-width:14ch">Questions, <span class="accent">answered.</span></h1>
+    <div class="faqs" style="margin-top:48px">
+      {faqs.map((f) => (
+        <details class="faq">
+          <summary><h3 style="margin:0;display:inline">{f.q}</h3><span class="chev" aria-hidden="true">+</span></summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+    <p style="margin-top:48px">Something we haven't covered? <a href="/contact/">Ask us directly →</a></p>
+  </section>
+</Base>
+
+<style>
+  .faqs { max-width: 860px; border-top: 1px solid var(--line); }
+  .faq { border-bottom: 1px solid var(--line); }
+  .faq summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 24px 4px; cursor: pointer; list-style: none;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary:hover h3 { color: var(--sage); }
+  .chev { color: var(--emerald); font-size: 26px; font-weight: 400; transition: transform 0.2s ease; flex: none; }
+  .faq[open] .chev { transform: rotate(45deg); }
+  .faq p { padding: 0 4px 24px; max-width: 75ch; margin: 0; }
+</style>

@@ -1,0 +1,192 @@
+
+## GROUP: Name
+TEXT: Welcome! I’m an AI assistant created by the Executive AI Institute to develop a tailored AI Leadership Roadmap for your organization.
+[image]
+TEXT: Over the next 3–5 minutes, you’ll answer a series of diagnostic multiple-choice questions about your leadership mindset, team readiness, past experiences, and AI ambitions.
+CHOICE -> var=?: Tell me more!
+TEXT: Let's get to know each other a bit. What's your name?
+INPUT(text input) -> var=name placeholder=
+
+## GROUP: Final Questions
+TEXT: Are you more likely to upskill your AI leadership skills yourself or coordinate an organizational initiative?
+CHOICE -> var=Upskill Dynamic: By myself | Organizational
+TEXT: What is your organization's name? (Please do not include special characters like / or @)
+INPUT(text input) -> var=organisation placeholder=
+TEXT: In a few sentences, describe your organization’s mission, industry and scale.
+INPUT(text input) -> var=Org Overview placeholder=
+TEXT: Do you have a website for your organization that you can share? This will help this AI tailor the AI Leadership Roadmap to your sector.
+CHOICE -> var=?: Yes | No
+
+## GROUP: Website
+TEXT: Please enter your organizations website?
+[url input]
+TEXT: Finally, to which email address would you like this AI assistant to send your AI Leadership Roadmap?
+INPUT(email input) -> var=email placeholder=
+CHOICE -> var=?: Build my leadership roadmap!
+[image]
+
+## GROUP: Introduction
+TEXT: Our AI Leadership Roadmap assesses 10 key areas.  - AI Leadership Maturity - Organizational AI Maturity - AI Change Adoption - AI Leadership Effectiveness - Leadership AI Understanding - AI Leadership Blindspots - AI Training & Capability - AI Opportunities - AI Inaction Risk Forecast - Recommendations
+TEXT: {{name}}, this isn’t a test—there are no right or wrong answers. Instead, your responses will reveal your organization’s strengths, gaps and unique challenges. At the end, I’ll use that insight to deliver data-driven analysis and targeted recommendations, so you can confidently plan your next steps on the AI journey.
+CHOICE -> var=?: Let’s get started!
+
+## GROUP: Q1
+TEXT: How confident are you in explaining basic AI concepts (e.g., machine learning, neural networks) to your team?
+CHOICE -> var=Q1: Not confident at all | Somewhat unsure | Fairly confident | Very confident
+
+## GROUP: Q2
+TEXT: How crucial is AI to your organization’s future success?
+CHOICE -> var=Q2: Critical | Important | Somewhat important | Not important
+
+## GROUP: Q3
+TEXT: Which step has your organization already taken toward AI?
+CHOICE -> var=Q3: None | Informal research or discussion | A small pilot or proof-of-concept | Multiple pilots or early deployments
+
+## GROUP: Q4
+TEXT: How much time can your team spare for testing new digital tools?
+CHOICE -> var=Q4: None | A little | A fair amount | Plenty
+
+## GROUP: Q5
+TEXT: Which of these describes your biggest daily friction point?
+CHOICE -> var=Q5: Gathering or cleaning data | Making decisions on incomplete information | Manual, repeatable tasks | Technical or system failures
+
+## GROUP: Q6
+TEXT: How easy is it for your team to pick up new digital skills?
+CHOICE -> var=Q6: Very hard | Somewhat hard | Somewhat easy | Very easy
+
+## GROUP: Q7
+TEXT: How do you feel your company reacts when you mention “we should try AI”?
+CHOICE -> var=Q7: Very open – let’s do it! | Open with caution – need more info | Resistant but curious – need proof | Resistant – not interested
+
+## GROUP: Q8
+TEXT: How often do teams share tips and help each other with new tools?
+CHOICE -> var=Q8: Never | Sometimes | Often | Always
+
+## GROUP: Q9
+TEXT: How would you rate your own understanding of AI?
+CHOICE -> var=Q9: Know nothing | Some awareness | Moderate competence | High competence
+
+## GROUP: Q10
+TEXT: How do you feel when you think of AI helping at work?
+CHOICE -> var=Q10: Very excited | Somewhat excited | Somewhat nervous | Very nervous
+
+## GROUP: Q11
+TEXT: To what extent do you agree with this statement:
+TEXT: “AI will transform the workforce over the next three years more profoundly than the internet did in its first twenty.”
+CHOICE -> var=Q11: Strongly disagree | Somewhat disagree | Somewhat agree | Strongly agree
+
+## GROUP: Q12
+TEXT: How often do you invite outside experts or skeptics to question your AI plans?
+CHOICE -> var=Q12: Never | Rarely | Sometimes | Frequently
+
+## GROUP: Q13
+TEXT: How do your leaders feel about adopting AI?
+CHOICE -> var=Q13: Very enthusiastic | Somewhat enthusiastic | Somewhat hesitant | Very hesitant
+
+## GROUP: Q14
+TEXT: Which best describes your current AI knowledge?
+CHOICE -> var=Q14: No knowledge | Basic awareness of terms | Moderate understanding of uses/limits | Deep understanding of strategy and ethics
+
+## GROUP: Q15
+TEXT: Looking back, how often have your organization change efforts failed?
+CHOICE -> var=Q15: Frequently | Occasionally | Rarely | Never attempted major change
+
+## GROUP: Q16
+TEXT: If an initial AI pilot misses its targets, how likely are you to revise strategy and try again?
+CHOICE -> var=Q16: Very unlikely | Somewhat unlikely | Somewhat likely | Very likely
+
+## GROUP: Q17
+TEXT: When facing a new technology choice, your leadership typically decides by:
+CHOICE -> var=Q17: Top-down decree | Collaborative discussion | Pilot-and-learn approach | Decentralized experimentation
+
+## GROUP: Q18
+TEXT: How do you allocate resources for change management and training?
+CHOICE -> var=Q18: None designated | Minimal, ad-hoc only | Some dedicated resources | Fully budgeted and staffed
+
+## GROUP: Q19
+TEXT: How do you gather user feedback on new tools or processes?
+CHOICE -> var=Q19: Not at all | Informally, as issues arise | Regular ad-hoc surveys or meetings | Structured feedback process with follow-up
+
+## GROUP: Q20
+TEXT: Which AI leadership area do you feel least prepared to address?
+CHOICE -> var=Q20: Crafting a clear AI vision | Establishing governance and ethics | Building technical skills in teams | Managing organizational change
+
+## GROUP: Q21
+TEXT: How well can your team articulate why AI matters to your top business goals?
+CHOICE -> var=Q21: Not at all clear | Only a few leaders understand | Broadly discussed but not fully aligned | Everyone can explain the “why”
+
+## GROUP: Q22
+TEXT: In past digital projects, how quickly did your team become comfortable using a new tool?
+CHOICE -> var=Q22: Very fast (days) | Fast (1–2 weeks) | Slow (1–3 months) | Very slow (over 3 months or never)
+
+## GROUP: Q23
+TEXT: Which success metric matters most for an AI project?
+CHOICE -> var=Q23: Revenue growth | Cost reduction | Efficiency gains (time saved) | Customer satisfaction improvements
+
+## GROUP: Q24
+TEXT: How do you treat mistakes made by a new tool?
+CHOICE -> var=Q24: Blame individuals | Shrug and move on | Hold a quick lessons-learned | Celebrate the learning opportunity
+
+## GROUP: Q25
+TEXT: How well do you understand your organization’s current data, technology, and process limits for deploying AI?
+CHOICE -> var=Q25: Not at all | A little | Quite well | Extremely well
+
+## GROUP: Q26
+TEXT: How frequently do you run hands-on AI upskilling sessions (workshops, labs or sprints) for non-technical staff?
+CHOICE -> var=Q26: Never | Once a year or less | Quarterly | Monthly or on-demand
+
+## GROUP: Q27
+TEXT: Which best describes your approach to managing AI-related risks?
+CHOICE -> var=Q27: No formal process | Ad-hoc reviews when issues arise | Written policies exist but aren’t consistently enforced | Automated monitoring and regular audits
+
+## GROUP: Q28
+TEXT: When planning AI initiatives, how often do you link them to specific KPIs or ROI targets?
+CHOICE -> var=Q28: Rarely or never | Sometimes, on an ad-hoc basis | Usually, for major projects | Always, as part of the standard process
+
+## GROUP: Q29
+TEXT: How does your organization treat mistakes during a new project?
+CHOICE -> var=Q29: Blames people | Shrugs and moves on | Talks about lessons | Celebrates learning
+
+## GROUP: Q30
+TEXT: What part of your daily work feels slow or stuck and might improve with a smart tool?
+CHOICE -> var=Q30: Gathering or cleaning data | Making decisions on incomplete information | Manual, repeatable tasks | Technical or system failures
+
+## GROUP: Q31
+TEXT: How willing are you to partner with external experts on AI?
+CHOICE -> var=Q31: Unlikely | Maybe for specific cases | Open to partnerships | Actively seek external partners
+
+## GROUP: Q32
+TEXT: How do you feel your company reacts when you mention “we should try AI”?
+CHOICE -> var=Q32: Very open – let’s do it! | Open with caution – need more info | Resistant but curious – need proof | Resistant – not interested
+
+## GROUP: Q33
+TEXT: How often do teams share tips and help each other with new tools?
+CHOICE -> var=Q33: Never | Sometimes | Often | Always
+
+## GROUP: Q34
+TEXT: What best describes your leadership team’s current AI maturity?
+CHOICE -> var=Q34: Just experimenting with AI | Clear AI strategy with limited alignment | Formalized policies and oversight in place | AI drives our day-to-day decisions
+
+## GROUP: Q35
+TEXT: What best describes your organization’s overall AI journey?
+CHOICE -> var=Q35: Only pilots and prototypes | Established practices but inconsistent scale | Repeatable processes & in key areas | Enterprise-wide, continuously optimized
+
+## GROUP: Q36
+TEXT: At what stage of change adoption is your organization regarding AI?
+CHOICE -> var=Q36: Most people don’t see AI’s relevance | We acknowledge AI but aren’t comfortable yet | Pilots are running but not scaling | We’re rolling out broadly | AI is embedded in our culture
+
+## GROUP: Short Answer
+TEXT: I'm preparing the detailed report that will be sent to your email shortly. In the meantime, here is a overview of your AI Leadership Roadmap.
+[OPENAI BLOCK] task=
+[Make.com]
+TEXT: Please note: The detailed graphical report will be more comprehensive and customised. This is a general overview.
+TEXT: {{AI Overview}}
+TEXT: (Your detailed graphic report may take a few minutes to arrive.)
+TEXT: Please note: These answers and the AI Leadership Roadmap was generated automatically and has not been reviewed. We cannot guarantee its accuracy and assume no liability for its content.
+CHOICE -> var=?: Restart conversation? | Resend Results
+
+## GROUP: Test Data
+[OPENAI BLOCK] task=
+
+## GROUP: Jump Back
+[Jump]

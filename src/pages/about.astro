@@ -1,0 +1,163 @@
+---
+import Base from '../layouts/Base.astro';
+
+const fiveCs = [
+  { t: 'Critical Thinking', d: 'Interrogating AI output instead of inheriting its confidence.' },
+  { t: 'Creativity', d: 'Seeing the use case the vendor deck never mentions.' },
+  { t: 'Communication', d: 'Translating between the board, the engineers and the people whose work changes.' },
+  { t: 'Collaboration', d: 'Making human-AI teaming an operating habit, not a pilot.' },
+  { t: 'Curiosity', d: 'Staying a learner while the ground keeps moving.' },
+];
+
+const partnerships = [
+  { t: 'Retained Clients', d: 'Pioneering organisations that retain ongoing consulting and transformation support, share real-world insights, and get early access to new AI curricula.' },
+  { t: 'Strategic Partners', d: 'Domain experts and technology providers who refer executives to our programs — leverage a proven curriculum, earn referral commissions, run joint marketing.' },
+  { t: 'Investors', d: 'Visionary backers who fuel our growth and help shape direction — exclusive briefings, performance insights and co-branding as we expand globally.' },
+  { t: 'Event Collaborators', d: 'Regional authorities and hosts who co-deliver open-enrolment programs — your local reputation, our instructors, shared success.' },
+];
+---
+<Base title="About | Executive AI Institute" description="We help senior leaders harness artificial intelligence without losing the human touch — leadership psychology meets hands-on AI mastery.">
+  <section class="section container" style="padding-top:160px">
+    <span class="kicker">About the Institute</span>
+    <h1 style="max-width:16ch">Technology that amplifies <span class="accent">human potential.</span></h1>
+    <p class="lead" style="margin-top:26px">
+      We help senior leaders harness artificial intelligence without losing the human touch.
+      Our programmes blend world-class leadership psychology with hands-on AI mastery, so
+      organisations can innovate responsibly, build inclusive cultures and deliver lasting value.
+    </p>
+  </section>
+
+  <!-- ── Team ─────────────────────────────────────────────── -->
+  <section class="section" style="background:var(--onyx);border-block:1px solid var(--line)">
+    <div class="container">
+      <span class="kicker">Our team</span>
+      <h2 class="reveal">Two complementary forces.</h2>
+
+      <div class="person reveal">
+        <div class="portrait">
+          <img src="/team/jonscott.avif" alt="Jonscott Turco" width="480" height="480" loading="lazy" />
+        </div>
+        <div>
+          <h3 style="font-size:clamp(24px,2.6vw,34px)">Jonscott Turco</h3>
+          <p class="role">Global C-Suite Advisor on AI &amp; Leadership Behaviour · Visionary Leadership</p>
+          <p>
+            CEO of HumINx and veteran advisor to Fortune 100 boards, Jonscott has spent 25 years
+            leading culture change across 50+ countries. His blend of behavioural psychology and
+            tech strategy helps executives build courageous, AI-ready organisations that thrive
+            amid disruption.
+          </p>
+          <a class="li-link" href="https://www.linkedin.com/in/jonscottturco/" rel="noopener" target="_blank">LinkedIn →</a>
+        </div>
+      </div>
+
+      <div class="person person--flip reveal">
+        <div class="portrait">
+          <img src="/team/jamiebykovbrett.avif" alt="Jamie Bykov-Brett" width="480" height="480" loading="lazy" />
+        </div>
+        <div>
+          <h3 style="font-size:clamp(24px,2.6vw,34px)">Jamie Bykov-Brett</h3>
+          <p class="role">Human-Centric Innovator &amp; AI Technology Consultant · Transformation Execution</p>
+          <p>
+            Award-winning social-impact entrepreneur and one of the Top 200 Business &amp; Technology
+            Innovators. Jamie turns AI, XR and automation into practical, people-first tools that
+            upskill teams and underserved communities — proving technology's true value is
+            amplifying human potential.
+          </p>
+          <a class="li-link" href="https://www.linkedin.com/in/jamiebykovbrett/" rel="noopener" target="_blank">LinkedIn →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Five C's ─────────────────────────────────────────── -->
+  <section class="section container">
+    <span class="kicker">The Five C's</span>
+    <div class="split-head">
+      <h2 class="reveal" style="max-width:16ch">What no algorithm replicates at board level.</h2>
+      <p class="lead reveal">Even in a data-driven world, the traits that set great leaders apart are uniquely human. We build every program around them.</p>
+    </div>
+    <ol class="cs-list" style="margin-top:48px">
+      {fiveCs.map((c, i) => (
+        <li class="cs-row reveal" style={`transition-delay:${i * 60}ms`}>
+          <span class="cs-n">C{i + 1}</span>
+          <span class="cs-t">{c.t}</span>
+          <span class="cs-d">{c.d}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- ── Partnerships ─────────────────────────────────────── -->
+  <section class="section container" style="padding-top:0">
+    <span class="kicker">Our partnerships</span>
+    <h2 class="reveal">Choose your collaboration path.</h2>
+    <div class="pgrid" style="margin-top:44px">
+      {partnerships.map((p, i) => (
+        <article class="card reveal" style={`transition-delay:${i * 70}ms`}>
+          <h3 style="color:var(--sage)">{p.t}</h3>
+          <p style="margin:0;font-size:15.5px">{p.d}</p>
+        </article>
+      ))}
+    </div>
+    <div style="margin-top:40px">
+      <a class="btn btn--solid" href="/contact/">Start a conversation</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .person {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: clamp(28px, 4vw, 64px);
+    align-items: center;
+    margin-top: 56px;
+  }
+  .person--flip { grid-template-columns: 1fr 320px; }
+  .person--flip .portrait { order: 2; }
+  .portrait {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    position: relative;
+    background: var(--pine);
+  }
+  .portrait::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(200deg, transparent 60%, rgba(5, 150, 105, 0.28));
+    pointer-events: none;
+  }
+  .portrait img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .role { font-size: 13.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--emerald); margin: -6px 0 16px; }
+  .li-link { font-weight: 700; color: var(--emerald); }
+  .li-link:hover { color: var(--sage); }
+  @media (max-width: 760px) {
+    .person, .person--flip { grid-template-columns: 1fr; }
+    .person--flip .portrait { order: 0; }
+    .portrait { max-width: 380px; }
+  }
+
+  .split-head { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 5vw, 80px); align-items: start; }
+  @media (max-width: 860px) { .split-head { grid-template-columns: 1fr; } }
+
+  .cs-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .cs-row {
+    display: grid;
+    grid-template-columns: 80px 300px 1fr;
+    gap: 24px;
+    padding: 26px 8px;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .cs-n { font-size: 14px; font-weight: 700; color: var(--emerald); letter-spacing: 0.1em; }
+  .cs-t { font-size: clamp(20px, 2vw, 26px); font-weight: 700; letter-spacing: -0.01em; }
+  .cs-d { color: var(--mist); font-size: 15.5px; }
+  @media (max-width: 760px) {
+    .cs-row { grid-template-columns: 48px 1fr; }
+    .cs-d { grid-column: 2; }
+  }
+
+  .pgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  @media (max-width: 760px) { .pgrid { grid-template-columns: 1fr; } }
+</style>

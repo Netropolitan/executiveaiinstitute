@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+// Live feed of EAII-branded events from the Brew events backend, fetched
+// client-side through the Tailscale Funnel route (/events-api), filtered to
+// brand=EAII. Create/manage events in the Brew EAII Events admin; publishing
+// one there makes it appear here automatically. Registration uses the shared
+// public registration page. The empty state shows until the first event ships.
+const EVENTS_API = 'https://kamino.taila07ff3.ts.net/events-api?brand=EAII';
+const REGISTER_BASE = 'https://kamino.taila07ff3.ts.net/events-widget.html';
+---
+<Base title="Events | Executive AI Institute" description="Briefings, workshops and live sessions for senior leaders navigating AI — hosted by the Executive AI Institute.">
+  <section class="section container" style="padding-top:160px;padding-bottom:48px">
+    <span class="kicker">Events</span>
+    <h1 style="max-width:15ch">In the room, <span class="accent">live.</span></h1>
+    <p class="lead" style="margin-top:24px">Executive briefings, open workshops and live sessions — online and in person. Register free; seats are limited by design.</p>
+  </section>
+
+  <section class="container" style="padding-bottom:120px">
+    <div id="events" data-api={EVENTS_API} data-register={REGISTER_BASE}>
+      <div class="card" style="text-align:center;padding:64px 28px;max-width:640px;margin:0 auto">
+        <h2 style="font-size:clamp(22px,2.4vw,30px)">No events scheduled right now</h2>
+        <p style="margin:0 auto;max-width:46ch">New briefings are announced regularly. <a href="/contact/">Tell us you'd like an invitation</a> and we'll let you know first.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const root = document.getElementById('events');
+  if (root) {
+    const api = root.dataset.api as string;
+    const registerBase = root.dataset.register as string;
+    const fmtDate = (iso: string) => {
+      try { return new Date(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
+      catch { return iso; }
+    };
+    const fmtTime = (iso: string) => {
+      try { return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
+      catch { return ''; }
+    };
+    const esc = (s: string) => (s || '').replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+
+    fetch(api)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((events: any[]) => {
+        const upcoming = Array.isArray(events) ? events : [];
+        if (!upcoming.length) return; // keep empty state
+        const cards = upcoming.map((ev) => {
+          const spots = ev.spots_remaining;
+          const closed = !ev.registration_open || (spots !== null && spots <= 0);
+          const where = ev.venue_type === 'online' ? 'Online' : (ev.location || 'In person');
+          return `
+            <article class="ev card">
+              <div class="ev-meta">
+                <span class="ev-tag ev-tag--date">${esc(fmtDate(ev.date_start))} · ${esc(fmtTime(ev.date_start))}</span>
+                <span class="ev-tag">${esc(ev.event_type || 'session')}</span>
+                <span class="ev-tag">${esc(where)}</span>
+              </div>
+              <h3 style="margin:14px 0 8px">${esc(ev.title)}</h3>
+              <p style="margin:0 0 22px;font-size:15px">${esc(ev.description || '')}</p>
+              <div class="ev-foot">
+                <a class="btn btn--solid" href="${registerBase}#${encodeURIComponent(ev.slug)}" target="_blank" rel="noopener">${closed ? 'Waitlist' : 'Register free'}</a>
+                <span class="ev-spots">${spots === null ? '' : spots + ' seats left'}</span>
+              </div>
+            </article>`;
+        }).join('');
+        root.innerHTML = `<div class="ev-grid">${cards}</div>`;
+      })
+      .catch(() => { /* keep empty state on any error */ });
+  }
+</script>
+
+<style is:global>
+  .ev-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; }
+  .ev { display: flex; flex-direction: column; }
+  .ev-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ev-tag {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: capitalize;
+    padding: 5px 12px; border-radius: 8px;
+    border: 1px solid var(--line-strong); color: var(--sage);
+  }
+  .ev-tag--date { background: rgba(5, 150, 105, 0.14); border-color: var(--emerald); }
+  .ev-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .ev-spots { font-size: 13px; color: var(--faint); }
+</style>

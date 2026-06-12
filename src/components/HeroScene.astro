@@ -1,0 +1,136 @@
+---
+// Full-bleed three.js backdrop for the homepage hero: a slowly turning lattice
+// of emerald nodes and connections — the "intelligence" motif. Degrades to the
+// static gradient when WebGL is unavailable or reduced motion is requested.
+---
+<div id="hero-scene" aria-hidden="true"></div>
+
+<style>
+  #hero-scene {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 70% 10%, rgba(6, 95, 70, 0.35), transparent 60%),
+      radial-gradient(90% 70% at 15% 90%, rgba(5, 150, 105, 0.16), transparent 55%),
+      var(--void);
+  }
+  #hero-scene::after {
+    /* bottom fade into the page so the canvas never hard-stops */
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 220px;
+    background: linear-gradient(to bottom, transparent, var(--void));
+    pointer-events: none;
+  }
+  #hero-scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+</style>
+
+<script>
+  import * as THREE from 'three';
+
+  const host = document.getElementById('hero-scene');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (host && !reduced) {
+    try {
+      const mobile = window.matchMedia('(max-width: 760px)').matches;
+      const N = mobile ? 90 : 170;          // node count
+      const LINK = mobile ? 1.45 : 1.25;    // connection distance
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      host.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 100);
+      camera.position.set(0, 0, 7.4);
+
+      // Nodes: jittered spherical shell so the form reads as a globe of thought
+      const pts = [];
+      for (let i = 0; i < N; i++) {
+        const phi = Math.acos(1 - (2 * (i + 0.5)) / N);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+        const r = 2.55 + (Math.sin(i * 12.9898) * 43758.5453 % 1) * 0.85;
+        pts.push(new THREE.Vector3(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.cos(phi) * 0.82,
+          r * Math.sin(phi) * Math.sin(theta)
+        ));
+      }
+
+      const group = new THREE.Group();
+      scene.add(group);
+
+      const nodeGeo = new THREE.BufferGeometry().setFromPoints(pts);
+      const nodes = new THREE.Points(nodeGeo, new THREE.PointsMaterial({
+        color: 0x059669, size: mobile ? 0.075 : 0.055, transparent: true, opacity: 0.95,
+        sizeAttenuation: true,
+      }));
+      group.add(nodes);
+
+      // A handful of brighter "executive" nodes
+      const brightGeo = new THREE.BufferGeometry().setFromPoints(pts.filter((_, i) => i % 13 === 0));
+      group.add(new THREE.Points(brightGeo, new THREE.PointsMaterial({
+        color: 0xa7d8c4, size: mobile ? 0.12 : 0.095, transparent: true, opacity: 0.9,
+      })));
+
+      // Connections
+      const linePos = [];
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          if (pts[i].distanceTo(pts[j]) < LINK) linePos.push(pts[i].x, pts[i].y, pts[i].z, pts[j].x, pts[j].y, pts[j].z);
+        }
+      }
+      const lineGeo = new THREE.BufferGeometry();
+      lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+      group.add(new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({
+        color: 0x0d7555, transparent: true, opacity: 0.34,
+      })));
+
+      // Inner core ring — quiet anchor
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(1.45, 0.012, 8, 120),
+        new THREE.MeshBasicMaterial({ color: 0x059669, transparent: true, opacity: 0.5 })
+      );
+      ring.rotation.x = Math.PI / 2.4;
+      group.add(ring);
+
+      // Offset the formation right-of-centre on desktop so the headline owns the left
+      group.position.x = mobile ? 0 : 1.9;
+      group.position.y = mobile ? 0.6 : 0;
+
+      let tx = 0, ty = 0; // pointer parallax targets
+      window.addEventListener('pointermove', (e) => {
+        tx = (e.clientX / window.innerWidth - 0.5) * 0.3;
+        ty = (e.clientY / window.innerHeight - 0.5) * 0.2;
+      }, { passive: true });
+
+      const size = () => {
+        const w = host.clientWidth, h = host.clientHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      };
+      size();
+      window.addEventListener('resize', size);
+
+      let visible = true;
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(host);
+
+      const clock = new THREE.Clock();
+      renderer.setAnimationLoop(() => {
+        if (!visible) return;
+        const t = clock.getElapsedTime();
+        group.rotation.y = t * 0.055;
+        group.rotation.x = Math.sin(t * 0.11) * 0.06 + ty;
+        group.rotation.z = tx * 0.4;
+        ring.rotation.z = t * 0.12;
+        renderer.render(scene, camera);
+      });
+    } catch (e) {
+      /* WebGL unavailable — static gradient stays */
+    }
+  }
+</script>

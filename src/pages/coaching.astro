@@ -1,0 +1,114 @@
+---
+import Base from '../layouts/Base.astro';
+
+const integrated = [
+  { t: 'Strategic Alignment', d: 'Unite high-level visioning with ground-level execution plans, so every initiative serves your long-term objectives.' },
+  { t: 'Cross-Functional', d: 'Bridge leadership, people and technology disciplines through a coordinated coaching cadence and shared playbooks.' },
+  { t: 'Sustainable Impact', d: 'Embed AI-ready mindsets, structures and skills across your enterprise — turning short-term wins into long-term advantage.' },
+];
+
+const steps = [
+  { n: '1', t: 'Reach out', d: 'Schedule a consultation and discover the package that fits.' },
+  { n: '2', t: 'Assess your needs', d: 'Determine whether leadership, execution, or both are your top priorities.' },
+  { n: '3', t: 'Launch your program', d: 'Bespoke one-on-one sessions, tailored to your schedule and focused on your highest-value outcomes.' },
+];
+---
+<Base title="Executive AI Coaching | Executive AI Institute" description="One-on-one coaching that blends visionary leadership guidance with hands-on technical execution for senior leaders driving AI transformation.">
+  <section class="section container" style="padding-top:160px">
+    <span class="kicker">Executive AI coaching</span>
+    <h1 style="max-width:16ch">Transformation, <span class="accent">one leader at a time.</span></h1>
+    <p class="lead" style="margin-top:26px">
+      We empower senior leaders to spearhead AI-driven transformation without losing strategic
+      focus. Our coaching blends visionary leadership guidance with hands-on technical execution,
+      so organisations can embed AI, manage change effectively and deliver lasting impact.
+    </p>
+  </section>
+
+  <!-- ── Coaches ──────────────────────────────────────────── -->
+  <section class="section" style="background:var(--onyx);border-block:1px solid var(--line)">
+    <div class="container coaches">
+      <article class="card coach reveal">
+        <img src="/team/jonscott.avif" alt="Jonscott Turco" width="120" height="120" loading="lazy" />
+        <h3 style="font-size:26px">Jonscott Turco</h3>
+        <p class="coach-role">Visionary Leadership</p>
+        <p style="font-size:15.5px">Harness 25 years of behavioural psychology and C-suite strategy to:</p>
+        <ul>
+          <li>Define your AI vision</li>
+          <li>Develop organisational architecture</li>
+          <li>Executive management practices &amp; leadership</li>
+        </ul>
+        <a class="coach-li" href="https://www.linkedin.com/in/jonscottturco/" target="_blank" rel="noopener">LinkedIn →</a>
+      </article>
+
+      <article class="card coach reveal" style="transition-delay:80ms">
+        <img src="/team/jamiebykovbrett.avif" alt="Jamie Bykov-Brett" width="120" height="120" loading="lazy" />
+        <h3 style="font-size:26px">Jamie Bykov-Brett</h3>
+        <p class="coach-role">Transformation Execution</p>
+        <p style="font-size:15.5px">Leverage award-winning social-impact innovation and technical expertise for:</p>
+        <ul>
+          <li>Change management excellence</li>
+          <li>Technical implementation roadmaps</li>
+          <li>Strategic learning &amp; development</li>
+        </ul>
+        <a class="coach-li" href="https://www.linkedin.com/in/jamiebykovbrett/" target="_blank" rel="noopener">LinkedIn →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Integrated ───────────────────────────────────────── -->
+  <section class="section container">
+    <span class="kicker">Integrated AI leadership coaching</span>
+    <h2 class="reveal">Better together.</h2>
+    <p class="lead reveal">Engage either coach individually — or both as an integrated program where vision and execution move in lockstep.</p>
+    <div class="tri" style="margin-top:44px">
+      {integrated.map((c, i) => (
+        <article class="card reveal" style={`transition-delay:${i * 70}ms`}>
+          <h3 style="color:var(--sage)">{c.t}</h3>
+          <p style="margin:0;font-size:15.5px">{c.d}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── Getting started ──────────────────────────────────── -->
+  <section class="section container" style="padding-top:0">
+    <span class="kicker">How to get started</span>
+    <h2 class="reveal">Three steps in.</h2>
+    <div class="steps" style="margin-top:44px">
+      {steps.map((s, i) => (
+        <div class="step reveal" style={`transition-delay:${i * 80}ms`}>
+          <span class="step-n">{s.n}</span>
+          <h3>{s.t}</h3>
+          <p style="margin:0;font-size:15.5px">{s.d}</p>
+        </div>
+      ))}
+    </div>
+    <div style="margin-top:46px">
+      <a class="btn btn--solid btn--lg" href="/contact/">Contact us</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .coaches { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 820px) { .coaches { grid-template-columns: 1fr; } }
+  .coach img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 2px solid var(--emerald); margin-bottom: 20px; }
+  .coach-role { font-size: 13px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--emerald); margin: -8px 0 14px; }
+  .coach ul { margin: 0 0 20px; padding: 0; list-style: none; }
+  .coach li { padding: 9px 0 9px 26px; border-bottom: 1px solid var(--line); position: relative; color: var(--mist); font-size: 15px; }
+  .coach li:last-child { border-bottom: 0; }
+  .coach li::before { content: '→'; position: absolute; left: 0; color: var(--emerald); font-weight: 700; }
+  .coach-li { font-weight: 700; color: var(--emerald); }
+
+  .tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .tri { grid-template-columns: 1fr; } }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(22px, 3vw, 40px); }
+  @media (max-width: 860px) { .steps { grid-template-columns: 1fr; } }
+  .step-n {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1.5px solid var(--emerald); color: var(--emerald);
+    font-weight: 700; font-size: 18px; margin-bottom: 18px;
+  }
+</style>

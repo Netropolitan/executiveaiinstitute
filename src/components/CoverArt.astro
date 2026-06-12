@@ -1,0 +1,90 @@
+---
+// Generative article cover — no thumbnails ever needed. A deterministic hash of
+// the slug picks one of eight geometric motifs from the BBE graphic vocabulary
+// and lays it over the constant dark→green gradient. Same slug → same cover.
+const { slug = 'post', height = 'clamp(200px, 30vw, 340px)' } = Astro.props;
+
+let h = 0;
+for (const c of slug) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+const motif = h % 8;
+const drift = (h >> 3) % 40;          // per-post variation in placement
+const tilt = ((h >> 6) % 24) - 12;    // small rotation
+
+const W = 1200, H = 480;
+const cx = 880 + drift * 2.4, cy = 200 + (drift % 3) * 30;
+const E = '#059669', S = '#a7d8c4';
+---
+<div class="cover" style={`height:${height}`} aria-hidden="true">
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id={`g-${slug}`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#070b09" />
+        <stop offset="0.55" stop-color="#065f46" />
+        <stop offset="1" stop-color="#059669" />
+      </linearGradient>
+    </defs>
+    <rect width={W} height={H} fill={`url(#g-${slug})`} />
+    <g transform={`rotate(${tilt} ${cx} ${cy})`}>
+      {motif === 0 && (
+        <g>{/* open ring */}
+          <circle cx={cx} cy={cy} r="150" fill="none" stroke="#ffffff2b" stroke-width="38" />
+          <circle cx={cx + 105} cy={cy - 105} r="16" fill={S} />
+        </g>
+      )}
+      {motif === 1 && (
+        <g>{/* concentric thin circles */}
+          {[60, 100, 140, 180].map((r) => <circle cx={cx} cy={cy} r={r} fill="none" stroke="#ffffff26" stroke-width="2.5" />)}
+          <circle cx={cx} cy={cy} r="14" fill={S} />
+        </g>
+      )}
+      {motif === 2 && (
+        <g>{/* dot grid */}
+          {Array.from({ length: 5 }).map((_, r) => Array.from({ length: 7 }).map((_, c) => (
+            <circle cx={cx - 180 + c * 60} cy={cy - 120 + r * 60} r="7" fill={(r + c) % 3 ? '#ffffff2e' : S} />
+          )))}
+        </g>
+      )}
+      {motif === 3 && (
+        <g>{/* diagonal pill bars */}
+          {[0, 1, 2, 3].map((i) => (
+            <rect x={cx - 160 + i * 78} y={cy - 150} width="34" height="300" rx="17"
+              fill={i === 2 ? `${E}cc` : '#ffffff24'} transform={`rotate(18 ${cx} ${cy})`} />
+          ))}
+        </g>
+      )}
+      {motif === 4 && (
+        <g>{/* open arc + node */}
+          <path d={`M ${cx - 150} ${cy + 90} A 170 170 0 1 1 ${cx + 150} ${cy + 90}`}
+            fill="none" stroke="#ffffff2e" stroke-width="30" stroke-linecap="round" />
+          <circle cx={cx} cy={cy - 168} r="18" fill={S} />
+        </g>
+      )}
+      {motif === 5 && (
+        <g>{/* rotated rounded squares */}
+          <rect x={cx - 130} y={cy - 130} width="260" height="260" rx="40" fill="none" stroke="#ffffff26" stroke-width="3" transform={`rotate(14 ${cx} ${cy})`} />
+          <rect x={cx - 95} y={cy - 95} width="190" height="190" rx="30" fill="none" stroke={`${E}b8`} stroke-width="3" transform={`rotate(-9 ${cx} ${cy})`} />
+        </g>
+      )}
+      {motif === 6 && (
+        <g>{/* ascending nodes — the EAII mark writ large */}
+          <path d={`M ${cx - 190} ${cy + 120} L ${cx - 60} ${cy - 10} L ${cx + 40} ${cy + 50} L ${cx + 180} ${cy - 120}`}
+            stroke="#ffffff38" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          {[[-190, 120], [-60, -10], [40, 50]].map(([dx, dy]) => <circle cx={cx + dx} cy={cy + dy} r="13" fill="#ffffff55" />)}
+          <circle cx={cx + 180} cy={cy - 120} r="17" fill={S} />
+        </g>
+      )}
+      {motif === 7 && (
+        <g>{/* double loop rings + dot */}
+          <circle cx={cx - 55} cy={cy} r="115" fill="none" stroke="#ffffff28" stroke-width="22" />
+          <circle cx={cx + 75} cy={cy} r="115" fill="none" stroke={`${E}a0`} stroke-width="22" />
+          <circle cx={cx + 75} cy={cy - 115} r="14" fill={S} />
+        </g>
+      )}
+    </g>
+  </svg>
+</div>
+
+<style>
+  .cover { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
+  .cover svg { width: 100%; height: 100%; display: block; }
+</style>

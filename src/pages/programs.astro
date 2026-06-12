@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+
+const programs = [
+  {
+    n: '01', t: 'Executive Insights', tag: 'Strategic primer',
+    d: 'Foundational discussions about artificial intelligence for the executive table. We quantify the cost of inaction — missed opportunities, operational inefficiency, competitive disadvantage — and identify quick-win AI opportunities your organisation can implement rapidly to demonstrate value.',
+    points: ['Cost-of-inaction analysis for your sector', 'Quick-win opportunity map', 'Board-ready language for the AI conversation'],
+  },
+  {
+    n: '02', t: 'Strategic Momentum Workshop', tag: 'Hands-on capability',
+    d: 'Comprehensive practical training covering core AI concepts, prompt engineering, strategy insights and oversight mechanisms for responsible deployment. Participants leave with key policy principles for managing, regulating and governing AI systems — and live pilots underway.',
+    points: ['Prompt engineering and generative-AI fundamentals', 'The 80/20 oversight rule in practice', 'Pilot projects launched in the room'],
+  },
+  {
+    n: '03', t: 'Transformation Intensive Masterclass', tag: 'Enterprise roadmap',
+    d: 'A deep-dive that produces your enterprise AI roadmap — ethical considerations, return on investment, governance frameworks, effective human-AI collaboration strategies, and the support mechanisms that make integration stick.',
+    points: ['Enterprise AI roadmap, co-authored with your leadership', 'Governance and ethics frameworks', 'Human-AI teaming strategy'],
+  },
+  {
+    n: '04', t: 'Ongoing Support', tag: 'Sustained advantage',
+    d: 'After the initial programme, keep us on speed-dial. Sixty-minute micro-labs and coaching sharpen skills exactly when needed; a curated community and monthly digest translate fast-moving AI news into "what this means for us" actions.',
+    points: ['On-demand executive coaching and decision support', '60-minute micro-skill labs', 'Curated monthly intelligence digest'],
+  },
+];
+---
+<Base title="Programs | Executive AI Institute" description="From a one-hour strategic primer to ongoing coaching — each module blends deep AI expertise with human-centric leadership practice.">
+  <section class="section container" style="padding-top:160px">
+    <span class="kicker">Core programs</span>
+    <h1 style="max-width:15ch">Meet your leaders <span class="accent">where they are.</span></h1>
+    <p class="lead" style="margin-top:26px">
+      From a one-hour strategic primer to deep-dive transformation and ongoing coaching, each
+      module blends deep AI expertise with human-centric leadership practice — so you realise
+      value fast and scale responsibly.
+    </p>
+  </section>
+
+  <section class="container" style="padding-bottom:40px">
+    {programs.map((p, i) => (
+      <article class="prog card reveal" style={`transition-delay:${(i % 2) * 60}ms`}>
+        <div class="prog-head">
+          <span class="prog-num">{p.n}</span>
+          <div>
+            <span class="prog-tag">{p.tag}</span>
+            <h2 style="font-size:clamp(24px,2.8vw,38px);margin-bottom:0">{p.t}</h2>
+          </div>
+        </div>
+        <div class="prog-body">
+          <p>{p.d}</p>
+          <ul>
+            {p.points.map((pt) => <li>{pt}</li>)}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <!-- ── HALO ─────────────────────────────────────────────── -->
+  <section class="section" style="background:var(--onyx);border-block:1px solid var(--line)">
+    <div class="container halo">
+      <div>
+        <span class="kicker">AI digital transformation</span>
+        <h2 class="reveal">The HALO framework.</h2>
+        <p class="lead reveal">
+          <strong style="color:var(--cream)">Human &amp; Artificial Leadership Operations</strong> — our structured
+          framework navigating discovery, strategy, architecture, governance and change management
+          to establish ethical, scalable AI systems that deliver lasting business value and cultural buy-in.
+        </p>
+        <p class="reveal">
+          We merge executive enablement, technical architecture design, governance frameworks and
+          continuous advisory to ensure responsible AI integration, rapid ROI realisation and
+          sustained organisational change.
+        </p>
+        <a class="btn btn--solid" href="/contact/" style="margin-top:14px">Discuss a transformation</a>
+      </div>
+      <svg class="halo-art reveal" viewBox="0 0 360 360" fill="none" aria-hidden="true">
+        <circle cx="180" cy="180" r="160" stroke="#0d7555" stroke-width="1.5" opacity="0.5" />
+        <circle cx="180" cy="180" r="118" stroke="#059669" stroke-width="1.5" opacity="0.45" />
+        <circle cx="180" cy="180" r="76" stroke="#a7d8c4" stroke-width="1.5" opacity="0.4" />
+        {['Discovery', 'Strategy', 'Architecture', 'Governance', 'Change'].map((label, i) => {
+          const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+          const x = 180 + Math.cos(a) * 160, y = 180 + Math.sin(a) * 160;
+          return (
+            <g>
+              <circle cx={x} cy={y} r="7" fill="#059669" />
+              <text x={x} y={y + (y > 180 ? 26 : -16)} fill="#a7d8c4" font-size="13" font-weight="700" text-anchor="middle" font-family="DM Sans, sans-serif">{label}</text>
+            </g>
+          );
+        })}
+        <text x="180" y="186" fill="#faf8f4" font-size="22" font-weight="700" text-anchor="middle" font-family="DM Sans, sans-serif">HALO</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="section container" style="text-align:center">
+    <h2 class="reveal" style="max-width:22ch;margin-inline:auto">Not sure which program fits?</h2>
+    <p class="lead reveal" style="margin:18px auto 34px">The Leadership Roadmap diagnostic will tell you where to start — free, in minutes.</p>
+    <a class="btn btn--solid btn--lg" href="/roadmap/">Build your roadmap</a>
+  </section>
+</Base>
+
+<style>
+  .prog { margin-bottom: 24px; }
+  .prog-head { display: flex; gap: 26px; align-items: flex-start; margin-bottom: 20px; }
+  .prog-num { font-size: 15px; font-weight: 700; color: var(--emerald); letter-spacing: 0.1em; padding-top: 14px; }
+  .prog-tag { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--emerald); margin-bottom: 8px; }
+  .prog-body { display: grid; grid-template-columns: 1.4fr 1fr; gap: clamp(20px, 4vw, 60px); }
+  .prog-body p { margin: 0; }
+  .prog-body ul { margin: 0; padding: 0; list-style: none; }
+  .prog-body li { padding: 10px 0 10px 26px; border-bottom: 1px solid var(--line); position: relative; color: var(--mist); font-size: 15px; }
+  .prog-body li:last-child { border-bottom: 0; }
+  .prog-body li::before { content: '→'; position: absolute; left: 0; color: var(--emerald); font-weight: 700; }
+  @media (max-width: 820px) { .prog-body { grid-template-columns: 1fr; } }
+
+  .halo { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(30px, 5vw, 80px); align-items: center; }
+  .halo-art { width: 100%; max-width: 380px; justify-self: center; }
+  @media (max-width: 860px) { .halo { grid-template-columns: 1fr; } }
+</style>

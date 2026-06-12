@@ -1,0 +1,52 @@
+---
+// "Our Clients" — continuous marquee of client marks, inverted to white on the
+// dark canvas. Logos live in /public/clients/. Duplicated track = seamless loop.
+const logos = [
+  'loreal', 'ralph-lauren', 'rockefeller-group', 'amazon', 'mtv', 'swiss-re',
+  'li-and-fung', 'citi', 'meta', 'pfizer', 'diversity-and-ability', 'cipd',
+  'edamah', 'akzonobel', 'kings-trust', 'mastercard',
+  'open-society-foundations', 'bocconi', 'tbwa',
+];
+const label = (s) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+---
+<div class="marquee" role="img" aria-label={`Client logos: ${logos.map(label).join(', ')}`}>
+  <div class="marquee-track">
+    {[0, 1].map(() => logos.map((l) => (
+      <span class="logo-cell"><img src={`/clients/${l}.png`} alt="" loading="lazy" width="350" height="350" /></span>
+    )))}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    position: relative;
+    padding: 18px 0;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    align-items: center;
+    gap: clamp(40px, 5vw, 76px);
+    width: max-content;
+    animation: scroll 60s linear infinite;
+  }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  .logo-cell { flex: none; display: flex; align-items: center; justify-content: center; }
+  .logo-cell img {
+    height: clamp(44px, 5vw, 62px);
+    width: auto;
+    max-width: 150px;
+    object-fit: contain;
+    filter: invert(1) brightness(1.4);
+    opacity: 0.62;
+    transition: opacity 0.25s ease;
+  }
+  .logo-cell img:hover { opacity: 1; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; row-gap: 28px; }
+    .marquee-track .logo-cell:nth-child(n + 20) { display: none; } /* hide the duplicate run */
+  }
+</style>
