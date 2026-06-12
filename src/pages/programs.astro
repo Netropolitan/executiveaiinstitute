@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import HaloScene from '../components/HaloScene.astro';
 
 const programs = [
   {
@@ -73,48 +74,7 @@ const programs = [
         </p>
         <a class="btn btn--solid" href="/contact/" style="margin-top:14px">Discuss a transformation</a>
       </div>
-      <svg class="halo-art reveal" viewBox="0 0 560 520" fill="none" aria-hidden="true">
-        {(() => {
-          const cx = 280, cy = 260, r = 148;
-          const NODES = [
-            { lines: ['Leadership', 'Enablement'], anchor: 'middle' },
-            { lines: ['AI Vision', '& Strategy'], anchor: 'start' },
-            { lines: ['Organization &', 'Technology', 'Architecture'], anchor: 'start' },
-            { lines: ['Implementation', 'Governance'], anchor: 'middle' },
-            { lines: ['Change', 'Management'], anchor: 'end' },
-            { lines: ['Augmenting', 'Human Capability'], anchor: 'end' },
-          ];
-          return (
-            <>
-              <circle cx={cx} cy={cy} r={r} stroke="#0d7555" stroke-width="1.5" opacity="0.55" />
-              <circle cx={cx} cy={cy} r={r - 44} stroke="#059669" stroke-width="1.5" opacity="0.4" />
-              <circle cx={cx} cy={cy} r={r - 86} stroke="#a7d8c4" stroke-width="1.5" opacity="0.35" />
-              {NODES.map((n, i) => {
-                const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
-                const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
-                // spoke from inner ring to node
-                const sx = cx + Math.cos(a) * (r - 86), sy = cy + Math.sin(a) * (r - 86);
-                const above = y < cy - r * 0.8, below = y > cy + r * 0.8;
-                const tx = n.anchor === 'middle' ? x : n.anchor === 'start' ? x + 18 : x - 18;
-                const ty0 = above ? y - 16 - (n.lines.length - 1) * 17 : below ? y + 30 : y - ((n.lines.length - 1) * 17) / 2 + 4;
-                return (
-                  <g>
-                    <line x1={sx} y1={sy} x2={x} y2={y} stroke="#0d7555" stroke-width="1" opacity="0.5" />
-                    <circle cx={x} cy={y} r="8" fill="#059669" />
-                    <circle cx={x} cy={y} r="13" stroke="#059669" stroke-width="1.5" opacity="0.4" />
-                    {n.lines.map((line, li) => (
-                      <text x={tx} y={ty0 + li * 17} fill="#dceee5" font-size="14" font-weight="700" text-anchor={n.anchor} font-family="DM Sans, sans-serif">{line}</text>
-                    ))}
-                  </g>
-                );
-              })}
-              <text x={cx} y={cy - 4} fill="#faf8f4" font-size="24" font-weight="700" text-anchor="middle" font-family="DM Sans, sans-serif">HALO</text>
-              <text x={cx} y={cy + 18} fill="#a7d8c4" font-size="12" font-weight="500" text-anchor="middle" font-family="DM Sans, sans-serif">AI Digital</text>
-              <text x={cx} y={cy + 33} fill="#a7d8c4" font-size="12" font-weight="500" text-anchor="middle" font-family="DM Sans, sans-serif">Transformation</text>
-            </>
-          );
-        })()}
-      </svg>
+      <div class="halo-art reveal"><HaloScene /></div>
     </div>
   </section>
 
@@ -138,7 +98,7 @@ const programs = [
   .prog-body li::before { content: '→'; position: absolute; left: 0; color: var(--emerald); font-weight: 700; }
   @media (max-width: 820px) { .prog-body { grid-template-columns: 1fr; } }
 
-  .halo { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(30px, 5vw, 80px); align-items: center; }
-  .halo-art { width: 100%; max-width: 380px; justify-self: center; }
+  .halo { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(30px, 5vw, 80px); align-items: center; }
+  .halo-art { width: 100%; max-width: 620px; justify-self: center; }
   @media (max-width: 860px) { .halo { grid-template-columns: 1fr; } }
 </style>
