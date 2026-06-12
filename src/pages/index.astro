@@ -230,14 +230,6 @@ const testimonials = [
     position: relative;
     padding: clamp(10px, 2vw, 30px) 0;
   }
-  /* ambient glow instead of a boxed card */
-  .cta-panel::before {
-    content: '';
-    position: absolute;
-    inset: -10% -20% -10% 30%;
-    background: radial-gradient(55% 60% at 70% 50%, rgba(5, 150, 105, 0.16), transparent 70%);
-    pointer-events: none;
-  }
   .cta-art { width: 100%; max-width: 520px; justify-self: center; position: relative; }
   @media (max-width: 860px) { .cta-panel { grid-template-columns: 1fr; } .cta-art { display: none; } }
 
