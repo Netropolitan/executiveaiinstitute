@@ -17,7 +17,7 @@
 </div>
 
 <style>
-  .cta-radar { position: relative; width: 100%; aspect-ratio: 1; max-width: 340px; }
+  .cta-radar { position: relative; width: 100%; aspect-ratio: 1; max-width: 520px; }
   .cta-radar canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
   .cta-radar.live .radar-fallback { display: none; }
   .radar-fallback { width: 100%; height: 100%; }
@@ -37,9 +37,11 @@
       host.classList.add('live');
 
       const scene = new THREE.Scene();
+      // Pulled back far enough that the tilted disc never touches the canvas
+      // edge (the section has no clipping box around it any more).
       const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
-      camera.position.set(0, 3.1, 4.6);
-      camera.lookAt(0, 0.1, 0);
+      camera.position.set(0, 3.4, 5.4);
+      camera.lookAt(0, 0.15, 0);
 
       const disc = new THREE.Group();
       disc.rotation.x = -0.12; // slight tip toward the viewer

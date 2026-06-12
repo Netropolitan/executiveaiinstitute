@@ -32,11 +32,7 @@ import Base from '../layouts/Base.astro';
           <li><b>Culture &amp; adoption</b>: how your people respond to change</li>
           <li><b>Governance &amp; risk</b>: how you manage what can go wrong</li>
         </ul>
-        <div class="field" style="max-width:420px;margin-top:26px">
-          <label for="orgname">Organisation name <span style="color:var(--faint);text-transform:none;letter-spacing:0">(optional, personalises your scorecard)</span></label>
-          <input id="orgname" type="text" autocomplete="organization" placeholder="e.g. Meridian Group" />
-        </div>
-        <button class="btn btn--solid btn--lg" id="startBtn">Begin the diagnostic</button>
+        <button class="btn btn--solid btn--lg" id="startBtn" style="margin-top:26px">Begin the diagnostic</button>
       </div>
 
       <!-- Questions injected here -->
@@ -165,7 +161,6 @@ import Base from '../layouts/Base.astro';
   const detailsEl = document.querySelector('[data-step="details"]');
 
   $('startBtn')?.addEventListener('click', () => {
-    org = ($('orgname') as HTMLInputElement).value.trim();
     introEl?.setAttribute('hidden', '');
     qEl?.removeAttribute('hidden');
     renderQ();
