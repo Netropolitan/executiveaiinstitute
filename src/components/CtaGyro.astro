@@ -62,11 +62,13 @@
 
       // ── Four rings, one per assessment dimension ──
       // Each ring lives in its own pivot group with a distinct axis + speed.
+      // Outer radius stays well inside the camera frustum (half-height ≈2.45
+      // at z=6.4) so no ring ever clips at the canvas edge, whatever the tilt.
       const RINGS = [
-        { r: 1.15, tube: 0.022, color: 0x34d399, axis: [1, 0.2, 0], speed: 0.55, opacity: 0.95 },
-        { r: 1.6, tube: 0.018, color: 0x059669, axis: [0.1, 1, 0.3], speed: -0.38, opacity: 0.85 },
-        { r: 2.05, tube: 0.015, color: 0x0d7555, axis: [0.5, 0.6, 1], speed: 0.26, opacity: 0.75 },
-        { r: 2.5, tube: 0.012, color: 0x065f46, axis: [0, 0.3, 1], speed: -0.18, opacity: 0.65 },
+        { r: 0.95, tube: 0.022, color: 0x34d399, axis: [1, 0.2, 0], speed: 0.55, opacity: 0.95 },
+        { r: 1.3, tube: 0.018, color: 0x059669, axis: [0.1, 1, 0.3], speed: -0.38, opacity: 0.85 },
+        { r: 1.65, tube: 0.015, color: 0x0d7555, axis: [0.5, 0.6, 1], speed: 0.26, opacity: 0.75 },
+        { r: 1.95, tube: 0.012, color: 0x065f46, axis: [0, 0.3, 1], speed: -0.18, opacity: 0.65 },
       ].map((cfg) => {
         const pivot = new THREE.Group();
         root.add(pivot);
@@ -108,7 +110,7 @@
       // sparse ambient stars
       const stars = [];
       for (let i = 0; i < 90; i++) {
-        const r = 2.8 + ((i * 0.37) % 1) * 1.6;
+        const r = 2.15 + ((i * 0.37) % 1) * 0.5;
         const th = i * 2.39996, ph = Math.acos(1 - 2 * ((i * 0.61) % 1));
         stars.push(new THREE.Vector3(
           r * Math.sin(ph) * Math.cos(th), r * Math.cos(ph) * 0.8, r * Math.sin(ph) * Math.sin(th)
