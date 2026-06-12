@@ -1,0 +1,191 @@
+---
+// Three.js "diagnostic radar" for the roadmap CTA panel: a tilted disc of
+// rings with a rotating sweep that lights blips as it passes, plus a cream
+// beacon ("where you stand") with a rising light column. Falls back to the
+// static SVG when WebGL is unavailable or reduced motion is requested.
+---
+<div class="cta-radar" aria-hidden="true">
+  <svg class="radar-fallback" viewBox="0 0 300 300" fill="none">
+    <circle cx="150" cy="150" r="130" stroke="#0d7555" stroke-width="1.5" opacity="0.6" />
+    <circle cx="150" cy="150" r="92" stroke="#059669" stroke-width="1.5" opacity="0.5" />
+    <path d="M70 210 L130 140 L172 168 L235 75" stroke="#a7d8c4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="70" cy="210" r="9" fill="#059669" />
+    <circle cx="130" cy="140" r="9" fill="#059669" />
+    <circle cx="172" cy="168" r="9" fill="#059669" />
+    <circle cx="235" cy="75" r="12" fill="#faf8f4" />
+  </svg>
+</div>
+
+<style>
+  .cta-radar { position: relative; width: 100%; aspect-ratio: 1; max-width: 340px; }
+  .cta-radar canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+  .cta-radar.live .radar-fallback { display: none; }
+  .radar-fallback { width: 100%; height: 100%; }
+</style>
+
+<script>
+  import * as THREE from 'three';
+
+  const host = document.querySelector('.cta-radar') as HTMLElement;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (host && !reduced) {
+    try {
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      host.appendChild(renderer.domElement);
+      host.classList.add('live');
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
+      camera.position.set(0, 3.1, 4.6);
+      camera.lookAt(0, 0.1, 0);
+
+      const disc = new THREE.Group();
+      disc.rotation.x = -0.12; // slight tip toward the viewer
+      scene.add(disc);
+
+      // Concentric rings
+      const RINGS = [0.8, 1.4, 2.0, 2.6];
+      RINGS.forEach((r, i) => {
+        const pts = [];
+        for (let a = 0; a <= 128; a++) {
+          const t = (a / 128) * Math.PI * 2;
+          pts.push(new THREE.Vector3(Math.cos(t) * r, 0, Math.sin(t) * r));
+        }
+        disc.add(new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints(pts),
+          new THREE.LineBasicMaterial({ color: i === RINGS.length - 1 ? 0x0d7555 : 0x065f46, transparent: true, opacity: i === RINGS.length - 1 ? 0.8 : 0.45 })
+        ));
+      });
+      // Radial spokes
+      for (let s = 0; s < 8; s++) {
+        const a = (s / 8) * Math.PI * 2;
+        disc.add(new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(Math.cos(a) * 0.25, 0, Math.sin(a) * 0.25),
+            new THREE.Vector3(Math.cos(a) * 2.6, 0, Math.sin(a) * 2.6),
+          ]),
+          new THREE.LineBasicMaterial({ color: 0x065f46, transparent: true, opacity: 0.28 })
+        ));
+      }
+
+      // Sweep: conic-gradient trail drawn once to a canvas texture
+      const c = document.createElement('canvas');
+      c.width = c.height = 512;
+      const ctx = c.getContext('2d');
+      if (ctx && 'createConicGradient' in ctx) {
+        const g = (ctx as any).createConicGradient(0, 256, 256);
+        g.addColorStop(0, 'rgba(5,150,105,0)');
+        g.addColorStop(0.82, 'rgba(5,150,105,0)');
+        g.addColorStop(0.985, 'rgba(52,211,153,0.5)');
+        g.addColorStop(1, 'rgba(167,216,196,0.9)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(256, 256, 256, 0, Math.PI * 2); ctx.fill();
+      } else if (ctx) {
+        ctx.fillStyle = 'rgba(5,150,105,0.25)';
+        ctx.beginPath(); ctx.moveTo(256, 256); ctx.arc(256, 256, 256, -0.5, 0); ctx.fill();
+      }
+      const sweep = new THREE.Mesh(
+        new THREE.CircleGeometry(2.6, 96),
+        new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, side: THREE.DoubleSide })
+      );
+      sweep.rotation.x = -Math.PI / 2;
+      sweep.position.y = 0.01;
+      disc.add(sweep);
+
+      // Blips: lit as the sweep passes
+      const BLIPS = [
+        [0.55, 0.6], [1.15, 2.1], [1.7, 3.4], [2.2, 4.4], [1.35, 5.2], [2.45, 1.4], [0.9, 4.0],
+      ].map(([r, a]) => {
+        const m = new THREE.Mesh(
+          new THREE.SphereGeometry(0.07, 16, 16),
+          new THREE.MeshBasicMaterial({ color: 0x059669, transparent: true, opacity: 0.35 })
+        );
+        m.position.set(Math.cos(a) * r, 0.04, Math.sin(a) * r);
+        disc.add(m);
+        return { m, a };
+      });
+
+      // The beacon: "where you stand" — cream node + light column + halo ring
+      const BA = 2.6, BR = 1.55;
+      const bx = Math.cos(BA) * BR, bz = Math.sin(BA) * BR;
+      const beacon = new THREE.Mesh(
+        new THREE.SphereGeometry(0.11, 20, 20),
+        new THREE.MeshBasicMaterial({ color: 0xfaf8f4 })
+      );
+      beacon.position.set(bx, 0.07, bz);
+      disc.add(beacon);
+
+      const column = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.07, 1.5, 12, 1, true),
+        new THREE.MeshBasicMaterial({ color: 0xa7d8c4, transparent: true, opacity: 0.35, depthWrite: false })
+      );
+      column.position.set(bx, 0.82, bz);
+      disc.add(column);
+
+      const halo = new THREE.Mesh(
+        new THREE.RingGeometry(0.16, 0.2, 48),
+        new THREE.MeshBasicMaterial({ color: 0xa7d8c4, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthWrite: false })
+      );
+      halo.rotation.x = -Math.PI / 2;
+      halo.position.set(bx, 0.03, bz);
+      disc.add(halo);
+
+      // Faint particle dust above the disc for depth
+      const dust = [];
+      for (let i = 0; i < 50; i++) {
+        const r = Math.sqrt((i * 0.37) % 1) * 2.5, a = i * 2.39996;
+        dust.push(new THREE.Vector3(Math.cos(a) * r, 0.1 + ((i * 0.61) % 1) * 1.2, Math.sin(a) * r));
+      }
+      disc.add(new THREE.Points(
+        new THREE.BufferGeometry().setFromPoints(dust),
+        new THREE.PointsMaterial({ color: 0x34d399, size: 0.025, transparent: true, opacity: 0.5 })
+      ));
+
+      const size = () => {
+        const w = host.clientWidth, h = host.clientHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      };
+      size();
+      window.addEventListener('resize', size);
+
+      let visible = true;
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(host);
+
+      const norm = (a) => ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      const clock = new THREE.Clock();
+      renderer.setAnimationLoop(() => {
+        if (!visible) return;
+        const t = clock.getElapsedTime();
+        const sweepA = t * 0.7;
+        sweep.rotation.z = sweepA;
+        disc.rotation.y = Math.sin(t * 0.1) * 0.18;
+
+        // Light blips as the sweep line passes, then fade
+        BLIPS.forEach(({ m, a }) => {
+          // CircleGeometry texture angle 0 sits along +x; world blip angle is -a around y
+          const behind = norm(sweepA - a) ;
+          const glow = Math.max(0, 1 - behind / 1.6);
+          const mat = m.material as THREE.MeshBasicMaterial;
+          mat.opacity = 0.3 + glow * 0.7;
+          mat.color.setHex(glow > 0.55 ? 0x34d399 : 0x059669);
+          m.scale.setScalar(1 + glow * 0.9);
+        });
+
+        // Beacon pulse
+        const pulse = (Math.sin(t * 2.2) + 1) / 2;
+        beacon.scale.setScalar(1 + pulse * 0.25);
+        (halo.material as THREE.MeshBasicMaterial).opacity = 0.35 + pulse * 0.45;
+        halo.scale.setScalar(1 + pulse * 0.6);
+        (column.material as THREE.MeshBasicMaterial).opacity = 0.2 + pulse * 0.25;
+
+        renderer.render(scene, camera);
+      });
+    } catch (e) {
+      /* WebGL unavailable; the static SVG fallback stays visible */
+    }
+  }
+</script>
