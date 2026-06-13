@@ -1,20 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 // Joint EAII × Bykov-Brett reports (e.g. The State of AI briefings). The list
-// comes live from the Brew backend via the EAII node's own funnel
-// (eaii.taila07ff3.ts.net/api/hygiene/public/reports) — the same data that
-// powers bykovbrett.net/reports, so publishing a report with the /reports skill
-// puts it on both sites automatically. Hosting the API on the EAII node (not the
-// shared kamino host) keeps the site working through kamino's serve churn.
+// comes live from the backend, so publishing a report with the /reports skill
+// puts it on both this site and bykovbrett.net/reports automatically.
 // Access is gated like the roadmap: name + work email + company, recorded to
-// the EAII Subscribers table tagged source=report.
+// the EAII Subscribers list tagged source=report.
 //
 // File delivery: the /reports publishing pipeline uploads `<slug>.pdf` and
 // `<slug>-cover.jpg` side by side on the HubSpot CDN, so the PDF URL is derived
 // from feature_image_url. If that convention ever breaks, the canonical gated
 // landing page (item.url) is offered as the fallback link.
-const REPORTS_API = 'https://eaii.taila07ff3.ts.net/api/hygiene/public/reports';
-const LEAD_ENDPOINT = 'https://eaii.taila07ff3.ts.net/api/automations/webhook/24/2bd446c001536638f15b1901a3851dd2';
+const REPORTS_API = 'https://api.runrevolution.org/api/hygiene/public/reports';
+const LEAD_ENDPOINT = 'https://api.runrevolution.org/api/automations/webhook/24/2bd446c001536638f15b1901a3851dd2';
 ---
 <Base title="Reports | Executive AI Institute" description="Enterprise AI briefings and research reports from the Executive AI Institute and Bykov-Brett Enterprises. Free access with your work email.">
   <section class="section container" style="padding-top:160px;padding-bottom:48px">
