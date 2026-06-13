@@ -4,7 +4,7 @@
 Polls the leadership tag RSS feed; any post without a matching file in
 src/content/blog/ is imported (via import_bbe_post.py), committed, and pushed
 when a git remote exists (GitHub Pages then redeploys the site automatically).
-The LinkedIn announcement is Brew a Brew automation, fed by the same RSS feed.
+A separate Brew automation handles the LinkedIn announcement from the same RSS feed.
 
 Run by the eaii-sync-leadership systemd timer (hourly).
 """
